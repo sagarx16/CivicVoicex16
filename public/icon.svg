@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F59E0B" />
+      <stop offset="100%" stop-color="#D97706" />
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="8" fill="url(#grad)" />
+  <g transform="translate(5, 5) scale(0.916)">
+    <!-- material-symbols: how_to_vote (scaled to fit nicely inside 32x32 box) -->
+    <path fill="#ffffff" d="M18 13h-1.16l2.03-2.03c.78-.78.78-2.05 0-2.83l-1.41-1.41c-.78-.78-2.05-.78-2.83 0L12 9.34 9.38 6.73a2.002 2.002 0 0 0-2.83 0L5.14 8.14c-.78.78-.78 2.05 0 2.83L7.17 13H6c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4c0-1.1-.9-2-2-2zm-6-4.66l2.83 2.83-2.83 2.83-2.83-2.83L12 8.34zM18 19H6v-4h12v4z" />
+  </g>
+</svg>
