@@ -119,15 +119,15 @@ export default function AppLayout({ children }: AppLayoutProps) {
             {/* Report button */}
             <Link
               href="/report"
-              className="flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold text-white shrink-0"
-              style={{ background: "linear-gradient(135deg, #F59E0B, #EA580C)" }}
+              className="flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-sm font-bold text-white shrink-0"
+              style={{ background: "linear-gradient(135deg, #F59E0B, #EA580C)", boxShadow: "0 2px 8px rgba(245,158,11,0.35)" }}
             >
-              <span className="material-symbols-outlined text-[14px] icon-filled">add</span>
+              <span className="material-symbols-outlined text-[18px] icon-filled">add</span>
               <span className="hidden sm:inline">Report</span>
             </Link>
 
             {/* Profile Avatar */}
-            <Link href="/profile" className="relative w-8 h-8 rounded-full overflow-hidden border-2 border-amber-500 shadow-sm shrink-0">
+            <Link href="/profile" className="relative w-10 h-10 rounded-full overflow-hidden border-[2.5px] border-amber-500 shadow-md shrink-0 hover:scale-105 transition-transform duration-200">
               <Image src={avatarUrl} alt="Avatar" fill className="object-cover" unoptimized />
             </Link>
           </div>
