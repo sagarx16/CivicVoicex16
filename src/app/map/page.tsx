@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import AppLayout from "@/components/AppLayout";
-import { setOptions, importLibrary } from "@googlemaps/js-api-loader";
+import "leaflet/dist/leaflet.css";
+import type * as LeafletType from "leaflet";
 
 // Markers with real coordinates centered around Kolkata, India
 const markersData = [
@@ -37,247 +38,219 @@ const statusStyles: Record<string, { bg: string; text: string; colorHex: string 
   Resolved: { bg: "bg-[#DCFCE7]", text: "text-[#15803D]", colorHex: "#22c55e" },
 };
 
-const getMarkerIconSvg = (type: string) => {
-  const color = markerColors[type] || "#6b7280";
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="38" height="38">
-    <path fill="${color}" stroke="#ffffff" stroke-width="1.5" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-  </svg>`;
-  return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
-};
-
 export default function MapPage() {
   const mapRef = useRef<HTMLDivElement>(null);
-  const [map, setMap] = useState<google.maps.Map | null>(null);
+  const mapInstanceRef = useRef<LeafletType.Map | null>(null);
+  const leafletModuleRef = useRef<typeof LeafletType | null>(null);
+  const markersLayerRef = useRef<LeafletType.LayerGroup | null>(null);
+  const reportMarkerRef = useRef<LeafletType.Marker | null>(null);
+  const markerObjectsRef = useRef<LeafletType.Marker[]>([]);
+
   const [activeCategory, setActiveCategory] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [googleMarkers, setGoogleMarkers] = useState<google.maps.Marker[]>([]);
-  const [, setSelectedIssue] = useState<typeof markersData[0] | null>(null);
+  const [isSearching, setIsSearching] = useState(false);
 
-  const reportMarkerRef = useRef<google.maps.Marker | null>(null);
-  const infoWindowRef = useRef<google.maps.InfoWindow | null>(null);
-
-  const hasApiKey = true;
-
-  // Load Google Maps API
+  // Initialize Map
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const originalError = console.error;
-      console.error = (...args) => {
-        const msg = args[0];
-        if (typeof msg === "string" && (
-          msg.includes("Google Maps JavaScript API error") || 
-          msg.includes("ApiProjectMapError") ||
-          msg.includes("InvalidKeyMapError")
-        )) {
-          return;
-        }
-        originalError(...args);
-      };
-    }
+    let isMounted = true;
 
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
-    const isKeyValid = apiKey.startsWith("AIza");
+    import("leaflet").then((L) => {
+      if (!isMounted || !mapRef.current || mapInstanceRef.current) return;
 
-    try {
-      if (isKeyValid) {
-        setOptions({
-          key: apiKey,
-          v: "weekly",
-        });
-      } else {
-        setOptions({
-          v: "weekly",
-        });
-      }
-    } catch {
-      // Ignore configuration re-definitions in React hot-reloading
-    }
+      leafletModuleRef.current = L;
 
-    Promise.all([
-      importLibrary("maps"),
-      importLibrary("geocoding"),
-    ])
-      .then(([mapsLib]) => {
-        if (!mapRef.current) return;
-
-        const mapInstance = new mapsLib.Map(mapRef.current, {
-          center: { lat: 22.5726, lng: 88.3639 }, // Kolkata Center
-          zoom: 13,
-          mapTypeControl: false,
-          streetViewControl: false,
-          fullscreenControl: false,
-          zoomControl: false, // Custom controls used instead
-          gestureHandling: "greedy",
-          scrollwheel: true,
-          styles: [
-            {
-              featureType: "poi",
-              elementType: "labels",
-              stylers: [{ visibility: "off" }],
-            },
-          ],
-        });
-
-        const infoWindow = new mapsLib.InfoWindow();
-        infoWindowRef.current = infoWindow;
-
-        // Create markers
-        const createdMarkers = markersData.map((data) => {
-          const marker = new google.maps.Marker({
-            position: { lat: data.lat, lng: data.lng },
-            map: mapInstance,
-            title: data.label,
-            icon: {
-              url: getMarkerIconSvg(data.type),
-              scaledSize: new google.maps.Size(38, 38),
-            },
-          });
-
-          marker.addListener("click", () => {
-            setSelectedIssue(data);
-            if (reportMarkerRef.current) {
-              reportMarkerRef.current.setMap(null);
-              reportMarkerRef.current = null;
-            }
-            const s = statusStyles[data.status];
-            const content = `
-              <div style="font-family: sans-serif; padding: 8px; min-width: 180px;">
-                <h3 style="margin: 0 0 6px 0; font-size: 14px; font-weight: bold; color: #111827;">${data.label}</h3>
-                <div style="display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: 600; border-radius: 9999px; background-color: ${s?.colorHex}15; color: ${s?.colorHex};">
-                  ${data.status}
-                </div>
-                <div style="margin-top: 10px; font-size: 12px; color: #4b5563;">
-                  Type: <span style="text-transform: capitalize; font-weight: 500;">${data.type}</span>
-                </div>
-              </div>
-            `;
-            infoWindow.setContent(content);
-            infoWindow.open(mapInstance, marker);
-          });
-
-          return marker;
-        });
-
-        setGoogleMarkers(createdMarkers);
-        setMap(mapInstance);
-
-        // Handle map clicks to place new pins
-        mapInstance.addListener("click", (e: google.maps.MapMouseEvent) => {
-          const latLng = e.latLng;
-          if (!latLng) return;
-
-          // Clear existing temporary marker if any
-          if (reportMarkerRef.current) {
-            reportMarkerRef.current.setMap(null);
-          }
-
-          const tempMarker = new google.maps.Marker({
-            position: latLng,
-            map: mapInstance,
-            icon: {
-              url:
-                "data:image/svg+xml;charset=UTF-8," +
-                encodeURIComponent(`
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="38" height="38">
-                  <path fill="#f59e0b" stroke="#ffffff" stroke-width="1.5" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                </svg>
-              `),
-              scaledSize: new google.maps.Size(38, 38),
-            },
-          });
-
-          reportMarkerRef.current = tempMarker;
-
-          const geocoder = new google.maps.Geocoder();
-          geocoder.geocode({ location: latLng }, (results, status) => {
-            let address = "Selected Location";
-            if (status === "OK" && results && results[0]) {
-              address = results[0].formatted_address;
-            }
-
-            const lat = latLng.lat().toFixed(6);
-            const lng = latLng.lng().toFixed(6);
-
-            const content = `
-              <div style="font-family: sans-serif; padding: 8px; min-width: 200px;">
-                <h3 style="margin: 0 0 4px 0; font-size: 14px; font-weight: bold; color: #111827;">Report Issue Here</h3>
-                <p style="margin: 0 0 10px 0; font-size: 12px; color: #6b7280; line-height: 1.4;">${address}</p>
-                <a href="/report?lat=${lat}&lng=${lng}&address=${encodeURIComponent(
-              address
-            )}" style="display: block; text-align: center; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 6px 12px; font-size: 12px; font-weight: bold; border-radius: 8px; text-decoration: none;">
-                  Create Report
-                </a>
-              </div>
-            `;
-            infoWindow.setContent(content);
-            infoWindow.open(mapInstance, tempMarker);
-          });
-        });
-      })
-      .catch((err: unknown) => {
-        console.error("Error loading Google Maps API:", err);
+      // Create Leaflet Map centered on Kolkata
+      const map = L.map(mapRef.current, {
+        center: [22.5726, 88.3639],
+        zoom: 13,
+        zoomControl: false,
+        attributionControl: false,
       });
+
+      mapInstanceRef.current = map;
+
+      // Official OpenStreetMap Tile Layer (100% Free, NO API key required, zero watermarks)
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19,
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
+
+      // Create Layer Group for markers
+      const markersLayer = L.layerGroup().addTo(map);
+      markersLayerRef.current = markersLayer;
+
+      // Build Marker Elements
+      const createdMarkers: LeafletType.Marker[] = [];
+
+      markersData.forEach((data) => {
+        const color = markerColors[data.type] || "#6b7280";
+        const customIcon = L.divIcon({
+          className: "custom-leaflet-marker",
+          html: `
+            <div style="position: relative; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.32)); cursor: pointer;">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="38" height="38">
+                <path fill="${color}" stroke="#ffffff" stroke-width="1.8" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+            </div>
+          `,
+          iconSize: [38, 38],
+          iconAnchor: [19, 38],
+          popupAnchor: [0, -36],
+        });
+
+        const marker = L.marker([data.lat, data.lng], { icon: customIcon });
+        const s = statusStyles[data.status];
+
+        const popupContent = `
+          <div style="font-family: inherit; padding: 4px; min-width: 180px;">
+            <h3 style="margin: 0 0 6px 0; font-size: 14px; font-weight: 700; color: #111827;">${data.label}</h3>
+            <div style="display: inline-block; padding: 2px 8px; font-size: 11px; font-weight: 600; border-radius: 9999px; background-color: ${s?.colorHex}18; color: ${s?.colorHex};">
+              ${data.status}
+            </div>
+            <div style="margin-top: 8px; font-size: 12px; color: #4b5563;">
+              Category: <span style="text-transform: capitalize; font-weight: 600; color: #1f2937;">${data.type}</span>
+            </div>
+          </div>
+        `;
+
+        marker.bindPopup(popupContent);
+        marker.addTo(markersLayer);
+        createdMarkers.push(marker);
+      });
+
+      markerObjectsRef.current = createdMarkers;
+
+      // Handle map clicks to place new issue report pin
+      map.on("click", async (e: LeafletType.LeafletMouseEvent) => {
+        const { lat, lng } = e.latlng;
+
+        if (reportMarkerRef.current) {
+          reportMarkerRef.current.remove();
+        }
+
+        const pinIcon = L.divIcon({
+          className: "custom-leaflet-marker",
+          html: `
+            <div style="position: relative; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; filter: drop-shadow(0 4px 8px rgba(0,0,0,0.35)); cursor: pointer;">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="38" height="38">
+                <path fill="#f59e0b" stroke="#ffffff" stroke-width="1.8" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+              </svg>
+            </div>
+          `,
+          iconSize: [38, 38],
+          iconAnchor: [19, 38],
+          popupAnchor: [0, -36],
+        });
+
+        const tempMarker = L.marker([lat, lng], { icon: pinIcon }).addTo(map);
+        reportMarkerRef.current = tempMarker;
+
+        const latStr = lat.toFixed(6);
+        const lngStr = lng.toFixed(6);
+
+        // Initial loading popup
+        tempMarker.bindPopup(`
+          <div style="font-family: inherit; padding: 4px; min-width: 200px;">
+            <h3 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700; color: #111827;">Report Issue Here</h3>
+            <p style="margin: 0 0 10px 0; font-size: 12px; color: #6b7280;">Fetching location details...</p>
+            <a href="/report?lat=${latStr}&lng=${lngStr}&address=Selected%20Location" style="display: block; text-align: center; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 6px 12px; font-size: 12px; font-weight: 700; border-radius: 8px; text-decoration: none;">
+              Create Report
+            </a>
+          </div>
+        `).openPopup();
+
+        // Reverse geocoding via OpenStreetMap Nominatim
+        try {
+          const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`);
+          const resData = await res.json();
+          const address = resData?.display_name || `Location (${latStr}, ${lngStr})`;
+
+          tempMarker.setPopupContent(`
+            <div style="font-family: inherit; padding: 4px; min-width: 200px;">
+              <h3 style="margin: 0 0 4px 0; font-size: 14px; font-weight: 700; color: #111827;">Report Issue Here</h3>
+              <p style="margin: 0 0 10px 0; font-size: 12px; color: #6b7280; line-height: 1.4; max-height: 52px; overflow: hidden; text-overflow: ellipsis;">${address}</p>
+              <a href="/report?lat=${latStr}&lng=${lngStr}&address=${encodeURIComponent(address)}" style="display: block; text-align: center; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; padding: 6px 12px; font-size: 12px; font-weight: 700; border-radius: 8px; text-decoration: none;">
+                Create Report
+              </a>
+            </div>
+          `).openPopup();
+        } catch {
+          // Keep default fallback
+        }
+      });
+    });
+
+    return () => {
+      isMounted = false;
+      if (mapInstanceRef.current) {
+        mapInstanceRef.current.remove();
+        mapInstanceRef.current = null;
+      }
+    };
   }, []);
 
   // Filter markers based on active category
   useEffect(() => {
-    googleMarkers.forEach((marker, index) => {
+    const markersLayer = markersLayerRef.current;
+    if (!markersLayer) return;
+
+    markersLayer.clearLayers();
+
+    markerObjectsRef.current.forEach((marker, index) => {
       const data = markersData[index];
       if (activeCategory === "all" || data.type === activeCategory) {
-        marker.setMap(map);
-      } else {
-        marker.setMap(null);
+        markersLayer.addLayer(marker);
       }
     });
 
-    if (infoWindowRef.current) {
-      infoWindowRef.current.close();
-    }
     if (reportMarkerRef.current) {
-      reportMarkerRef.current.setMap(null);
+      reportMarkerRef.current.remove();
       reportMarkerRef.current = null;
     }
-  }, [activeCategory, googleMarkers, map]);
+  }, [activeCategory]);
 
-  const handleSearch = (e?: React.FormEvent) => {
+  // Search Location via Nominatim
+  const handleSearch = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    if (!map || !searchQuery.trim() || typeof window === "undefined" || !window.google) return;
+    const map = mapInstanceRef.current;
+    if (!map || !searchQuery.trim()) return;
 
-    const geocoder = new window.google.maps.Geocoder();
-    geocoder.geocode({ address: searchQuery }, (results, status) => {
-      if (status === "OK" && results && results[0]) {
-        map.setCenter(results[0].geometry.location);
-        map.setZoom(15);
+    setIsSearching(true);
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}`);
+      const results = await res.json();
+      if (results && results.length > 0) {
+        const { lat, lon } = results[0];
+        map.flyTo([parseFloat(lat), parseFloat(lon)], 14, { duration: 1.2 });
       } else {
-        alert("Location not found. Please try another query.");
+        alert("Location not found. Please try another place name.");
       }
-    });
+    } catch {
+      alert("Search request failed. Please check network connection.");
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const handleZoomIn = () => {
-    if (!map) return;
-    map.setZoom((map.getZoom() || 13) + 1);
+    mapInstanceRef.current?.zoomIn();
   };
 
   const handleZoomOut = () => {
-    if (!map) return;
-    map.setZoom((map.getZoom() || 13) - 1);
+    mapInstanceRef.current?.zoomOut();
   };
 
   const handleMyLocation = () => {
+    const map = mapInstanceRef.current;
     if (!map) return;
+
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position: GeolocationPosition) => {
-          const pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-          map.setCenter(pos);
-          map.setZoom(15);
+          map.flyTo([position.coords.latitude, position.coords.longitude], 15, { duration: 1.2 });
         },
         () => {
-          alert("Error: The Geolocation service failed.");
+          alert("Error: The Geolocation service failed or was denied.");
         }
       );
     } else {
@@ -293,21 +266,14 @@ export default function MapPage() {
           <p className="text-gray-500 mt-1">Explore reported issues in your neighborhood in real time</p>
         </div>
 
-        {!hasApiKey && (
-          <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs flex items-center gap-2">
-            <span className="material-symbols-outlined text-[18px] text-amber-600">info</span>
-            <span>
-              <strong>Map Sandbox Mode:</strong> Copy <code>.env.example</code> to <code>.env.local</code> and set <code>NEXT_PUBLIC_GOOGLE_MAPS_API_KEY</code> to enable full production Google Maps.
-            </span>
-          </div>
-        )}
-
         <div className="flex flex-col lg:flex-row gap-6">
           {/* Sidebar */}
           <aside className="lg:w-72 shrink-0 flex flex-col gap-4">
             {/* Search */}
             <form onSubmit={handleSearch} className="relative">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[20px]">search</span>
+              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-[20px]">
+                {isSearching ? "sync" : "search"}
+              </span>
               <input
                 className="block w-full pl-10 pr-10 py-3 border border-gray-200 rounded-xl bg-white text-sm placeholder:text-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-300"
                 placeholder="Search location..."
@@ -329,15 +295,16 @@ export default function MapPage() {
             {/* Category filters */}
             <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
               <p className="font-bold text-gray-900 mb-3 text-sm">Filter by Category</p>
-              <div className="flex flex-row overflow-x-auto lg:flex-col gap-2 pb-2 lg:pb-0 scrollbar-none">
+              <div className="flex flex-col gap-1">
                 {categories.map((cat) => {
                   const isActive = activeCategory === cat.id;
                   return (
                     <button
                       key={cat.id}
                       onClick={() => setActiveCategory(cat.id)}
-                      className={`flex items-center justify-between p-3 rounded-xl transition-all text-left group cursor-pointer shrink-0 ${isActive ? `${cat.activeBg} text-white` : "hover:bg-gray-50 text-gray-700"
-                        }`}
+                      className={`flex items-center justify-between p-3 rounded-xl transition-all text-left group cursor-pointer ${
+                        isActive ? `${cat.activeBg} text-white` : "hover:bg-gray-50 text-gray-700"
+                      }`}
                     >
                       <div className="flex items-center gap-3">
                         <span className={`material-symbols-outlined ${isActive ? "text-white" : cat.color} text-[20px]`}>
@@ -348,8 +315,9 @@ export default function MapPage() {
                         </span>
                       </div>
                       <span
-                        className={`text-xs px-2 py-0.5 rounded-full font-semibold ${isActive ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600"
-                          }`}
+                        className={`text-xs px-2 py-0.5 rounded-full font-semibold ${
+                          isActive ? "bg-white/20 text-white" : "bg-gray-100 text-gray-600"
+                        }`}
                       >
                         {cat.count}
                       </span>
@@ -378,11 +346,11 @@ export default function MapPage() {
           {/* Map area */}
           <div className="flex-1">
             {/* Map Canvas */}
-            <div className="relative h-[380px] sm:h-[460px] lg:h-[600px] rounded-3xl overflow-hidden shadow-xl border border-gray-200">
-              <div ref={mapRef} className="w-full h-full bg-stone-100" />
+            <div className="relative rounded-3xl overflow-hidden shadow-xl border border-gray-200" style={{ height: 520 }}>
+              <div ref={mapRef} className="w-full h-full bg-stone-100 z-0" />
 
               {/* Map controls */}
-              <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
+              <div className="absolute top-4 right-4 flex flex-col gap-2 z-[400]">
                 <button
                   onClick={handleZoomIn}
                   className="w-9 h-9 bg-white rounded-xl flex items-center justify-center shadow-lg hover:bg-amber-50 hover:text-amber-600 transition-colors cursor-pointer"
@@ -407,7 +375,7 @@ export default function MapPage() {
               </div>
 
               {/* Report button */}
-              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-10">
+              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-[400]">
                 <a
                   href="/report"
                   className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white text-sm shadow-2xl hover:-translate-y-1 hover:shadow-amber-500/40 transition-all duration-300"
@@ -430,10 +398,11 @@ export default function MapPage() {
                     <div
                       key={i}
                       onClick={() => {
-                        if (map && googleMarkers[i] && typeof window !== "undefined" && window.google) {
-                          map.setCenter({ lat: marker.lat, lng: marker.lng });
-                          map.setZoom(15);
-                          window.google.maps.event.trigger(googleMarkers[i], "click");
+                        const map = mapInstanceRef.current;
+                        const targetMarker = markerObjectsRef.current[i];
+                        if (map && targetMarker) {
+                          map.flyTo([marker.lat, marker.lng], 15, { duration: 1 });
+                          targetMarker.openPopup();
                         }
                       }}
                       className="bg-white rounded-xl border border-gray-100 shadow-sm p-4 flex items-center gap-3 hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer"

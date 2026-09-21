@@ -148,6 +148,27 @@
   }
 }
 
+/* ── Leaflet Map Enhancements & Fixes ── */
+.leaflet-container img {
+  max-width: none !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 16px !important;
+  box-shadow: 0 12px 30px -4px rgba(0, 0, 0, 0.2), 0 4px 12px -2px rgba(0, 0, 0, 0.1) !important;
+  padding: 4px !important;
+}
+
+.leaflet-popup-content {
+  margin: 10px 14px !important;
+  line-height: 1.4 !important;
+}
+
+.custom-leaflet-marker {
+  background: transparent;
+  border: none;
+}
+
 /* ── Base styles ── */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -155,7 +176,10 @@
 
 html {
   scroll-behavior: smooth;
-  overflow-x: hidden;
+}
+
+section[id] {
+  scroll-margin-top: 100px;
 }
 
 body {
@@ -164,22 +188,6 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  min-width: 320px;
-  overflow-x: hidden;
-}
-
-img,
-svg,
-video,
-canvas {
-  max-width: 100%;
-}
-
-button,
-input,
-textarea,
-select {
-  max-width: 100%;
 }
 
 /* ── Material Symbols ── */
@@ -254,11 +262,40 @@ select:focus {
   border-color: #f59e0b !important;
 }
 
-/* ── Scrollbar hide utility ── */
-.scrollbar-none {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* ── Clerk Overrides (Hide Development Mode Badge & Watermark) ── */
+.cl-developmentModeBadge,
+.cl-footer__development,
+[data-localization-key="developmentMode"],
+.cl-internal-developmentModeBadge,
+div[class*="developmentMode"],
+span[class*="developmentMode"],
+p[class*="developmentMode"],
+.cl-branding,
+.cl-footer__branding {
+  display: none !important;
 }
-.scrollbar-none::-webkit-scrollbar {
-  display: none;
+
+/* ── Hide Cloudflare Turnstile & CAPTCHA Box ── */
+iframe[src*="cloudflare"],
+iframe[src*="turnstile"],
+iframe[src*="challenges.cloudflare.com"],
+div:has(> iframe[src*="cloudflare"]),
+div:has(> iframe[src*="turnstile"]),
+div:has(> iframe[src*="challenges.cloudflare.com"]),
+.cl-captcha,
+#cl-captcha-wrapper,
+#clerk-captcha,
+[data-clerk-captcha],
+div[class*="captcha"],
+div[class*="turnstile"] {
+  display: none !important;
+  visibility: hidden !important;
+  height: 0 !important;
+  max-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  overflow: hidden !important;
 }
+
+

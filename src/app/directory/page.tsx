@@ -84,34 +84,35 @@ export default function DirectoryPage() {
         </p>
 
         {/* Grid */}
-        <div className="grid md:grid-cols-2 gap-5 items-stretch">
+        <div className="grid md:grid-cols-2 gap-5">
           {filtered.map((official) => (
             <div 
               key={official.name} 
-              className="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 p-4 sm:p-5 flex h-full flex-col justify-between hover:shadow-hover hover:-translate-y-1 transition-all duration-300 group"
+              className="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 p-5 flex flex-col justify-between hover:shadow-hover hover:-translate-y-1 transition-all duration-300 group"
             >
-              <div className="flex items-start gap-3 sm:gap-4">
+              <div className="flex items-start gap-4">
                 {/* Avatar with border */}
-                <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl overflow-hidden shrink-0 border-2 border-primary-fixed-dim/40 shadow-sm transition-transform duration-300 group-hover:scale-105">
+                <div className="relative w-16 h-16 rounded-2xl overflow-hidden shrink-0 border-2 border-primary-fixed-dim/40 shadow-sm transition-transform duration-300 group-hover:scale-105">
                   <Image
                     src={official.avatar}
                     alt={official.name}
                     fill
                     className="object-cover"
+                    loading="lazy"
                     unoptimized
                   />
                 </div>
                 
                 {/* Details */}
                 <div className="flex-1 min-w-0">
-                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1.5 sm:gap-2">
-                    <div className="min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
                       <h3 className="text-body-lg font-bold text-on-surface leading-tight truncate group-hover:text-primary transition-colors">
                         {official.name}
                       </h3>
                       <p className="text-label-md text-primary font-medium mt-0.5">{official.role}</p>
                     </div>
-                    <span className={`self-start text-[11px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-md ${
+                    <span className={`text-[11px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-md ${
                       official.tag === "Elected"
                         ? "bg-amber-100/70 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300"
                         : "bg-surface-container text-on-surface-variant"
@@ -138,10 +139,10 @@ export default function DirectoryPage() {
                 </a>
                 <a
                   href={`tel:${official.phone}`}
-                  className="flex min-w-0 items-center justify-center gap-1.5 px-2 py-2 rounded-xl text-label-sm font-semibold text-on-secondary-container bg-secondary-container/40 hover:bg-secondary-container hover:text-on-secondary-container transition-all duration-200"
+                  className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-label-sm font-semibold text-on-secondary-container bg-secondary-container/40 hover:bg-secondary-container hover:text-on-secondary-container transition-all duration-200"
                 >
-                  <span className="material-symbols-outlined shrink-0 text-[16px] icon-filled">call</span>
-                  <span className="truncate">{official.phone}</span>
+                  <span className="material-symbols-outlined text-[16px] icon-filled">call</span>
+                  {official.phone}
                 </a>
               </div>
             </div>

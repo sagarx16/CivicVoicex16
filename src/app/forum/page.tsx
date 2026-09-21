@@ -205,6 +205,7 @@ export default function ForumPage() {
                         alt={thread.title}
                         fill
                         className="object-cover"
+                        loading="lazy"
                         unoptimized
                       />
                     </div>

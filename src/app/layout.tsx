@@ -1,3 +1,4 @@
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import "./globals.css";
 
@@ -5,9 +6,6 @@ export const metadata: Metadata = {
   title: "CivicVoice — Your voice, your city, your impact",
   description:
     "Join thousands of citizens actively shaping your community. Report local issues, participate in vital polls, and connect with neighborhood initiatives.",
-  icons: {
-    icon: "/civicvoice-favicon.svg",
-  },
 };
 
 export default function RootLayout({
@@ -18,7 +16,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/civicvoice-favicon.svg" type="image/svg+xml" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link
           rel="preconnect"
@@ -34,7 +31,19 @@ export default function RootLayout({
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
         />
       </head>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <ClerkProvider
+          signInFallbackRedirectUrl="/dashboard"
+          signUpFallbackRedirectUrl="/dashboard"
+          signInForceRedirectUrl="/dashboard"
+          signUpForceRedirectUrl="/dashboard"
+          appearance={{
+            unsafe_disableDevelopmentModeWarnings: true,
+          } as Record<string, unknown>}
+        >
+          {children}
+        </ClerkProvider>
+      </body>
     </html>
   );
 }

@@ -3,11 +3,10 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useUser, useClerk } from "@clerk/nextjs";
 
 const navItems = [
   { href: "/dashboard", icon: "dashboard", label: "Dashboard", color: "text-blue-600", activeBg: "bg-blue-50" },
-  { href: "/profile", icon: "account_circle", label: "My Profile", color: "text-amber-600", activeBg: "bg-amber-50" },
-  { href: "/my-issues", icon: "assignment", label: "My Issues", color: "text-amber-600", activeBg: "bg-amber-50" },
   { href: "/report", icon: "report_problem", label: "Report Issue", color: "text-red-600", activeBg: "bg-red-50" },
   { href: "/polls", icon: "poll", label: "Polls", color: "text-purple-600", activeBg: "bg-purple-50" },
   { href: "/map", icon: "map", label: "Map", color: "text-green-600", activeBg: "bg-green-50" },
@@ -19,21 +18,41 @@ const navItems = [
 
 interface SidebarProps {
   onClose?: () => void;
+  onOpenProfile?: () => void;
 }
 
-export default function Sidebar({ onClose }: SidebarProps) {
+export default function Sidebar({ onClose, onOpenProfile }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const [hasUnread, setHasUnread] = useState(false);
+  const [profileName, setProfileName] = useState("Sagar Pathak");
+  const [avatarUrl, setAvatarUrl] = useState("https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150&h=150");
+  const { user } = useUser();
+  const { signOut } = useClerk();
+  const displayName = user?.fullName || user?.firstName || user?.username || profileName;
+  const displayAvatar = user?.imageUrl || avatarUrl;
+
+  useEffect(() => {
+    const updateProfile = () => {
+      const storedName = localStorage.getItem("civicvoice_user_name") || "Sagar Pathak";
+      const storedAvatar = localStorage.getItem("civicvoice_avatar_url") || "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150&h=150";
+      setProfileName(storedName);
+      setAvatarUrl(storedAvatar);
+    };
+
+    updateProfile();
+    window.addEventListener("profile-updated", updateProfile);
+    return () => window.removeEventListener("profile-updated", updateProfile);
+  }, []);
 
   useEffect(() => {
     const updateNotifications = () => {
       const stored = localStorage.getItem("civicvoice_notifications");
       if (stored) {
         try {
-          const list = JSON.parse(stored);
-          setHasUnread(list.some((n: { read?: boolean }) => !n.read));
-        } catch (err) {
+          const list = JSON.parse(stored) as Array<{ read?: boolean }>;
+          setHasUnread(list.some((n) => !n.read));
+        } catch {
           setHasUnread(true);
         }
       } else {
@@ -57,10 +76,10 @@ export default function Sidebar({ onClose }: SidebarProps) {
         justifyContent: "space-between"
       }}
     >
-      {/* ── TOP SECTION: Navigation Links (No User Profile Card) ── */}
+      {/* ── TOP SECTION: Navigation Links ── */}
       <div className="flex flex-col gap-1 flex-grow relative">
         {onClose && (
-          <button 
+          <button
             onClick={onClose}
             className="md:hidden absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center hover:bg-stone-200 text-stone-500 focus:outline-none"
           >
@@ -134,17 +153,47 @@ export default function Sidebar({ onClose }: SidebarProps) {
         })}
       </div>
 
-      <button
-        type="button"
-        onClick={() => {
-          onClose?.();
-          router.push("/login");
-        }}
-        className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 group font-bold text-sm text-amber-600 bg-amber-50 hover:bg-amber-100"
-      >
-        <span className="material-symbols-outlined text-[22px] text-amber-600">logout</span>
-        <span>Log out</span>
-      </button>
+      {/* ── BOTTOM SECTION: Profile Card + Logout ── */}
+      <div className="flex flex-col gap-2 pt-3 border-t border-amber-100">
+        <button
+          type="button"
+          onClick={() => {
+            onClose?.();
+            onOpenProfile?.();
+          }}
+          className="flex items-center gap-3 p-2.5 rounded-2xl bg-white hover:bg-amber-50/80 border border-stone-200 transition-all text-left cursor-pointer group shadow-2xs hover:shadow-xs"
+          title="Open Profile"
+        >
+          <div className="relative w-9 h-9 rounded-full overflow-hidden border-2 border-amber-500 shrink-0">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={displayAvatar} alt={displayName} className="w-full h-full object-cover" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1">
+              <span className="text-xs font-black text-stone-900 truncate group-hover:text-amber-700">
+                {displayName}
+              </span>
+              <span className="material-symbols-outlined text-amber-500 text-[14px] icon-filled">verified</span>
+            </div>
+            <p className="text-[10px] text-stone-500 font-semibold truncate">District 9 · 1,250 Pts</p>
+          </div>
+          <span className="material-symbols-outlined text-stone-400 group-hover:text-amber-600 text-[18px]">
+            account_circle
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={async () => {
+            onClose?.();
+            await signOut(() => router.push("/"));
+          }}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-150 group font-bold text-xs text-amber-700 bg-amber-50 hover:bg-amber-100 cursor-pointer"
+        >
+          <span className="material-symbols-outlined text-[18px] text-amber-600">logout</span>
+          <span>Log out</span>
+        </button>
+      </div>
     </aside>
   );
 }

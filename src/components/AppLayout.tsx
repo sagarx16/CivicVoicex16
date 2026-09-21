@@ -2,201 +2,319 @@
 
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
+import dynamic from "next/dynamic";
 import Sidebar from "./Sidebar";
+import { UserButton, SignInButton, Show, useUser } from "@clerk/nextjs";
+
+// Lazy load ProfileModal so its bundle is only downloaded when opened
+const ProfileModal = dynamic(() => import("./ProfileModal"), {
+  ssr: false,
+});
 
 interface AppLayoutProps {
   children: React.ReactNode;
 }
 
-const navItems = [
-  { href: "/dashboard", icon: "dashboard", label: "Dashboard" },
-  { href: "/my-issues", icon: "assignment", label: "Issues" },
-  { href: "/map", icon: "map", label: "Map" },
-  { href: "/forum", icon: "forum", label: "Forum" },
-  { href: "/polls", icon: "poll", label: "Polls" },
-  { href: "/notifications", icon: "notifications", label: "Alerts" },
-];
+const pageTitles: Record<string, { title: string; desc: string }> = {
+  "/dashboard": { title: "Dashboard Overview", desc: "District 9 Civic Command Center" },
+  "/report": { title: "Report an Issue", desc: "Flag infrastructure & public safety hazards" },
+  "/polls": { title: "District Polls & Surveys", desc: "Vote on city proposals & participatory budgets" },
+  "/map": { title: "Interactive Civic Map", desc: "Live geo-spatial reports & community alerts" },
+  "/forum": { title: "Community Discussions", desc: "Engage with neighbors & municipal representatives" },
+  "/directory": { title: "Representative Directory", desc: "Public official contacts & district offices" },
+  "/rewards": { title: "Civic Rewards & Leaderboard", desc: "Citizen points, badges, & district ranking" },
+  "/notifications": { title: "Notification Center", desc: "Updates on your reports, polls, and badges" },
+};
 
 export default function AppLayout({ children }: AppLayoutProps) {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150&h=150");
-  const [hasUnread, setHasUnread] = useState(false);
   const pathname = usePathname();
-  const router = useRouter();
-  const searchRef = useRef<HTMLInputElement>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [hasUnreadNotifs, setHasUnreadNotifs] = useState(true);
+  const [unreadCount, setUnreadCount] = useState(3);
+  const [profileName, setProfileName] = useState("Sagar Pathak");
+  const { user } = useUser();
+  const displayName = user?.fullName || user?.firstName || user?.username || profileName;
+  const notifsDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const updateAvatar = () => {
-      const storedAvatar = localStorage.getItem("civicvoice_avatar_url") || "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150&h=150";
-      setAvatarUrl(storedAvatar);
-    };
-    updateAvatar();
-    window.addEventListener("profile-updated", updateAvatar);
-    return () => window.removeEventListener("profile-updated", updateAvatar);
-  }, []);
+    const updateProfileAndNotifs = () => {
+      const storedName = localStorage.getItem("civicvoice_user_name") || "Sagar Pathak";
+      setProfileName(storedName);
 
-  useEffect(() => {
-    const updateNotifications = () => {
-      const stored = localStorage.getItem("civicvoice_notifications");
-      if (stored) {
+      const storedNotifs = localStorage.getItem("civicvoice_notifications");
+      if (storedNotifs) {
         try {
-          const list = JSON.parse(stored);
-          setHasUnread(list.some((n: { read?: boolean }) => !n.read));
+          const list = JSON.parse(storedNotifs) as Array<{ read?: boolean }>;
+          const unread = list.filter((n) => !n.read).length;
+          setHasUnreadNotifs(unread > 0);
+          setUnreadCount(unread);
         } catch {
-          setHasUnread(true);
+          setHasUnreadNotifs(true);
+          setUnreadCount(3);
         }
       } else {
-        setHasUnread(true);
+        setHasUnreadNotifs(true);
+        setUnreadCount(3);
       }
     };
-    updateNotifications();
-    window.addEventListener("notifications-updated", updateNotifications);
-    return () => window.removeEventListener("notifications-updated", updateNotifications);
+
+    updateProfileAndNotifs();
+    window.addEventListener("profile-updated", updateProfileAndNotifs);
+    window.addEventListener("notifications-updated", updateProfileAndNotifs);
+    return () => {
+      window.removeEventListener("profile-updated", updateProfileAndNotifs);
+      window.removeEventListener("notifications-updated", updateProfileAndNotifs);
+    };
   }, []);
 
+  // Close notification popover on outside click or Escape
   useEffect(() => {
-    if (searchOpen) setTimeout(() => searchRef.current?.focus(), 100);
-  }, [searchOpen]);
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      setSearchOpen(false);
-      setSearchQuery("");
+    function handleClickOutside(event: MouseEvent) {
+      if (notifsDropdownRef.current && !notifsDropdownRef.current.contains(event.target as Node)) {
+        setNotificationsOpen(false);
+      }
     }
-  };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setNotificationsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FAF9F7]">
-      {/* ── NAVBAR (Mobile + Desktop top bar) ── */}
-      <header className="sticky top-0 z-40 bg-white border-b border-[#F0E4D7] shadow-sm">
-        <div className="flex items-center gap-2 h-14 px-3 sm:px-4 md:pl-72 md:pr-6">
-          {/* Mobile: Hamburger */}
-          <button
-            onClick={() => setMobileMenuOpen(true)}
-            className="md:hidden w-9 h-9 flex items-center justify-center rounded-full hover:bg-stone-100 text-stone-600 transition-colors shrink-0"
-          >
-            <span className="material-symbols-outlined text-[22px]">menu</span>
-          </button>
+      {/* ── Mobile Top Bar (Header inside dashboard for mobile screens) ── */}
+      <header className="md:hidden flex justify-between items-center h-16 px-5 bg-white border-b border-[#F0E4D7] sticky top-0 z-40 shadow-xs">
+        <button 
+          onClick={() => setMobileMenuOpen(true)}
+          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-stone-100 text-stone-600 transition-colors cursor-pointer"
+          aria-label="Open navigation drawer"
+        >
+          <span className="material-symbols-outlined text-[24px]">menu</span>
+        </button>
 
-          {/* Mobile Logo */}
-          <Link href="/" className="md:hidden flex items-center gap-2" style={{ textDecoration: "none" }}>
-            <div className="w-7 h-7 rounded-lg flex items-center justify-center bg-gradient-to-br from-amber-500 to-orange-500 shadow-md">
-              <span className="material-symbols-outlined text-white text-[14px] icon-filled">how_to_vote</span>
-            </div>
-            <span className="font-black text-stone-900 text-base">Civic<span className="text-amber-600">Voice</span></span>
+        <Link href="/" className="flex items-center gap-2" style={{ textDecoration: "none" }}>
+          <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-gradient-to-br from-amber-500 to-orange-500 shadow-md">
+            <span className="material-symbols-outlined text-white text-[16px] icon-filled">how_to_vote</span>
+          </div>
+          <span className="font-black text-stone-900 text-base">Civic<span className="text-amber-600">Voice</span></span>
+        </Link>
+
+        {/* Mobile Right: Notification Bell & Profile Avatar */}
+        <div className="flex items-center gap-1.5">
+          <Link
+            href="/notifications"
+            className="relative w-9 h-9 rounded-full flex items-center justify-center text-stone-700 hover:bg-stone-100 transition-colors"
+            title="Notifications"
+            aria-label="View notifications"
+          >
+            <span className="material-symbols-outlined text-[22px]">notifications</span>
+            {hasUnreadNotifs && (
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-white animate-pulse" />
+            )}
           </Link>
 
-          {/* Desktop: Page title area (spacer) */}
-          <div className="hidden md:flex flex-1 items-center">
-            {/* Search bar — desktop always visible */}
-            <form onSubmit={handleSearch} className="relative w-full max-w-xs">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-stone-400">search</span>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search issues, polls, forums…"
-                className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-200 bg-gray-50 text-sm text-stone-700 placeholder:text-stone-400 focus:outline-none focus:border-amber-400 focus:bg-white focus:ring-2 focus:ring-amber-400/20 transition-all"
-              />
-            </form>
-          </div>
-
-          {/* Right side actions */}
-          <div className="flex items-center gap-2 ml-auto shrink-0">
-            {/* Search icon — mobile only (toggle) */}
-            <button
-              onClick={() => setSearchOpen(!searchOpen)}
-              className="md:hidden w-9 h-9 flex items-center justify-center rounded-full hover:bg-stone-100 text-stone-500 transition-colors"
-            >
-              <span className="material-symbols-outlined text-[22px]">{searchOpen ? "close" : "search"}</span>
-            </button>
-
-            {/* Report button */}
-            <Link
-              href="/report"
-              className="flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-sm font-bold text-white shrink-0"
-              style={{ background: "linear-gradient(135deg, #F59E0B, #EA580C)", boxShadow: "0 2px 8px rgba(245,158,11,0.35)" }}
-            >
-              <span className="material-symbols-outlined text-[18px] icon-filled">add</span>
-              <span className="hidden sm:inline">Report</span>
-            </Link>
-
-            {/* Profile Avatar */}
-            <Link href="/profile" className="relative w-10 h-10 rounded-full overflow-hidden border-[2.5px] border-amber-500 shadow-md shrink-0 hover:scale-105 transition-transform duration-200">
-              <Image src={avatarUrl} alt="Avatar" fill className="object-cover" unoptimized />
-            </Link>
-          </div>
+          <Show when="signed-in">
+            <UserButton
+              appearance={{
+                elements: {
+                  userButtonAvatarBox: "w-8 h-8 rounded-full border-2 border-amber-500 shadow-sm"
+                }
+              }}
+            />
+          </Show>
+          <Show when="signed-out">
+            <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
+              <button 
+                type="button"
+                className="px-3 py-1 rounded-full bg-amber-500 text-stone-900 text-xs font-bold hover:bg-amber-400 transition-colors cursor-pointer"
+              >
+                Log In
+              </button>
+            </SignInButton>
+          </Show>
         </div>
-
-        {/* Mobile Search Bar (slides down when searchOpen) */}
-        {searchOpen && (
-          <div className="md:hidden px-4 pb-3 animate-fade-in">
-            <form onSubmit={handleSearch} className="relative">
-              <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-[18px] text-stone-400">search</span>
-              <input
-                ref={searchRef}
-                type="text"
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search issues, polls, forums…"
-                className="w-full pl-9 pr-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm text-stone-700 placeholder:text-stone-400 focus:outline-none focus:border-amber-400 focus:bg-white focus:ring-2 focus:ring-amber-400/20 transition-all"
-              />
-            </form>
-          </div>
-        )}
       </header>
 
       <div className="flex flex-1">
-        {/* Sidebar Container — desktop fixed, mobile slide-in drawer */}
+        {/* Sidebar Container */}
         <div className={`fixed inset-y-0 left-0 w-64 z-50 md:z-40 transition-transform duration-300 ease-in-out md:translate-x-0 ${
           mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         }`}>
-          <Sidebar onClose={() => setMobileMenuOpen(false)} />
+          <Sidebar 
+            onClose={() => setMobileMenuOpen(false)} 
+            onOpenProfile={() => setProfileModalOpen(true)}
+          />
         </div>
 
         {/* Backdrop for mobile */}
         {mobileMenuOpen && (
-          <div
+          <div 
             onClick={() => setMobileMenuOpen(false)}
             className="fixed inset-0 bg-stone-900/40 backdrop-blur-xs z-40 md:hidden animate-fade-in"
           />
         )}
 
-        <main className="flex-1 md:ml-64 min-w-0 p-3 sm:p-4 md:p-8 pb-24 md:pb-8 bg-background">{children}</main>
+        <div className="flex-1 md:ml-64 min-w-0 flex flex-col">
+          {/* ── DESKTOP DASHBOARD TOP NAVBAR (Header with Notification Bell & Profile) ── */}
+          <header className="hidden md:flex justify-between items-center h-16 px-8 bg-white/90 backdrop-blur-md border-b border-[#F0E4D7] sticky top-0 z-30 shadow-2xs">
+            {/* Left: Page Title & Breadcrumb */}
+            <div className="flex items-center gap-3">
+              <div>
+                <h1 className="text-base font-black text-stone-900 tracking-tight leading-tight">
+                  {pageTitles[pathname]?.title || "Dashboard Overview"}
+                </h1>
+                <p className="text-[11px] text-stone-500 font-medium leading-none mt-0.5">
+                  {pageTitles[pathname]?.desc || "District 9 Civic Hub"}
+                </p>
+              </div>
+            </div>
+
+            {/* Right: Notification Bell & Profile */}
+            <div className="flex items-center gap-3" ref={notifsDropdownRef}>
+              {/* Notification Bell Dropdown Button */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setNotificationsOpen(!notificationsOpen)}
+                  className={`relative w-10 h-10 rounded-full flex items-center justify-center transition-all cursor-pointer ${
+                    notificationsOpen
+                      ? "bg-amber-100 text-amber-900 shadow-inner"
+                      : "hover:bg-stone-100 text-stone-600"
+                  }`}
+                  aria-label="Open notifications"
+                  title="Notifications"
+                >
+                  <span className="material-symbols-outlined text-[22px]">
+                    notifications
+                  </span>
+                  {hasUnreadNotifs && (
+                    <span className="absolute top-2 right-2 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-white animate-pulse" />
+                  )}
+                </button>
+
+                {/* Desktop Notifications Dropdown Popover */}
+                {notificationsOpen && (
+                  <div className="absolute top-full right-0 mt-2 w-84 bg-white rounded-2xl border border-stone-200 shadow-2xl p-4 z-50 animate-in fade-in zoom-in-95 duration-150">
+                    <div className="flex items-center justify-between pb-2.5 mb-2.5 border-b border-stone-100 px-1">
+                      <div className="flex items-center gap-1.5">
+                        <span className="material-symbols-outlined text-amber-600 text-[18px]">
+                          notifications
+                        </span>
+                        <span className="text-xs font-bold text-stone-900 uppercase tracking-wider">
+                          Notifications
+                        </span>
+                      </div>
+                      {unreadCount > 0 && (
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-50 text-red-600 border border-red-200">
+                          {unreadCount} new
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <div className="p-2.5 rounded-xl bg-stone-50 border border-stone-100 hover:bg-amber-50/50 transition-colors">
+                        <div className="flex items-start gap-2.5">
+                          <span className="material-symbols-outlined text-emerald-600 text-[18px] mt-0.5 shrink-0">
+                            check_circle
+                          </span>
+                          <div>
+                            <p className="text-xs font-bold text-stone-900 leading-snug">
+                              Pothole Issue Resolved!
+                            </p>
+                            <p className="text-[11px] text-stone-500 mt-0.5 line-clamp-2">
+                              Public Works completed repair on Elm Blvd.
+                            </p>
+                            <span className="text-[10px] text-stone-400 mt-1 block">2 hours ago</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="p-2.5 rounded-xl bg-stone-50 border border-stone-100 hover:bg-amber-50/50 transition-colors">
+                        <div className="flex items-start gap-2.5">
+                          <span className="material-symbols-outlined text-amber-600 text-[18px] mt-0.5 shrink-0">
+                            how_to_vote
+                          </span>
+                          <div>
+                            <p className="text-xs font-bold text-stone-900 leading-snug">
+                              New District Survey
+                            </p>
+                            <p className="text-[11px] text-stone-500 mt-0.5 line-clamp-2">
+                              Vote on District 9 Parks and Green Corridor Budget.
+                            </p>
+                            <span className="text-[10px] text-stone-400 mt-1 block">5 hours ago</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="mt-2.5 pt-2 border-t border-stone-100 flex justify-center">
+                      <Link
+                        href="/notifications"
+                        onClick={() => setNotificationsOpen(false)}
+                        className="text-xs font-bold text-amber-600 hover:text-amber-700 py-1"
+                      >
+                        View All in Notifications →
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <Show when="signed-in">
+                <div className="flex items-center gap-2 pl-2 pr-3 py-1 rounded-full bg-stone-50 border border-stone-200/80">
+                  <UserButton
+                    appearance={{
+                      elements: {
+                        userButtonAvatarBox: "w-8 h-8 rounded-full border-2 border-amber-500 shadow-sm"
+                      }
+                    }}
+                  />
+                  <div className="text-left hidden lg:block">
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs font-bold text-stone-900 leading-none">
+                        {displayName}
+                      </span>
+                      <span className="material-symbols-outlined text-amber-500 text-[14px] icon-filled">verified</span>
+                    </div>
+                    <p className="text-[10px] text-stone-400 font-medium mt-0.5">District 9 Rep</p>
+                  </div>
+                </div>
+              </Show>
+
+              <Show when="signed-out">
+                <SignInButton mode="modal" fallbackRedirectUrl="/dashboard" forceRedirectUrl="/dashboard">
+                  <button
+                    type="button"
+                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-amber-500 hover:bg-amber-600 text-stone-900 font-bold text-xs shadow-sm transition-colors cursor-pointer"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">login</span>
+                    Log In
+                  </button>
+                </SignInButton>
+              </Show>
+            </div>
+          </header>
+
+          {/* Main Dashboard Content */}
+          <main className="flex-1 min-w-0 p-6 md:p-8 bg-background">{children}</main>
+        </div>
       </div>
 
-      {/* ── Mobile Bottom Navigation Bar ── */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-[#F0E4D7] shadow-lg">
-        <div className="flex items-stretch">
-          {navItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="flex-1 flex flex-col items-center justify-center py-2 gap-0.5 relative transition-colors"
-                style={{ color: isActive ? "#D97706" : "#78716C" }}
-              >
-                {isActive && (
-                  <span className="absolute top-0 inset-x-2 h-0.5 rounded-b-full bg-amber-500" />
-                )}
-                <span className={`material-symbols-outlined text-[22px] ${isActive ? "icon-filled" : ""}`}>
-                  {item.icon}
-                </span>
-                {item.href === "/notifications" && hasUnread && (
-                  <span className="absolute top-1.5 right-1/4 w-2 h-2 bg-red-500 rounded-full border-2 border-white animate-pulse" />
-                )}
-                <span className="text-[10px] font-bold">{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+      {/* Global Profile Modal ("Profile Wala") */}
+      <ProfileModal
+        isOpen={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
+      />
     </div>
   );
 }

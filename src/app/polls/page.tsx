@@ -94,24 +94,24 @@ export default function PollsPage() {
   return (
     <AppLayout>
       <div className="max-w-[800px] mx-auto animate-fade-in">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
+        <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-headline-lg-mobile md:text-headline-md font-bold text-on-surface flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary text-[28px] md:text-[36px] icon-filled">
+            <h1 className="text-headline-lg-mobile md:text-headline-md font-bold text-on-surface flex items-center gap-2.5">
+              <span className="material-symbols-outlined text-primary text-[32px] md:text-[36px] icon-filled">
                 ballot
               </span>
-              Polls &amp; Surveys
+              Polls & Surveys
             </h1>
-            <p className="text-body-md text-on-surface-variant mt-1">
+            <p className="text-body-md text-on-surface-variant mt-2">
               Make your voice heard on community decisions
             </p>
           </div>
-          <div className="flex bg-surface-container rounded-lg p-1 gap-1 self-start sm:self-auto overflow-x-auto">
+          <div className="flex bg-surface-container rounded-lg p-1 gap-1">
             {["Active", "Closed", "My Votes"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setFilter(tab)}
-                className={`px-3 py-1.5 rounded-md text-label-md transition-colors whitespace-nowrap ${
+                className={`px-3 py-1.5 rounded-md text-label-md transition-colors ${
                   filter === tab
                     ? "bg-surface-container-lowest text-on-surface shadow-subtle"
                     : "text-on-surface-variant hover:text-on-surface"

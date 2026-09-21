@@ -21,12 +21,12 @@ export default function NotificationsPage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const stored = localStorage.getItem("civicvoice_notifications");
-    setTimeout(() => {
+    queueMicrotask(() => {
+      const stored = localStorage.getItem("civicvoice_notifications");
       if (stored) {
         try {
           setNotifs(JSON.parse(stored));
-        } catch (err) {
+        } catch {
           setNotifs(notifications);
         }
       } else {
@@ -34,7 +34,7 @@ export default function NotificationsPage() {
         setNotifs(notifications);
       }
       setMounted(true);
-    }, 0);
+    });
   }, []);
 
   const typeMap: Record<string, string> = {

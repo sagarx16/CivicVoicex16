@@ -4,14 +4,7 @@ import AppLayout from "@/components/AppLayout";
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-
-interface SubCardProps {
-  title: string;
-  count: string;
-  metric?: string;
-  color: string;
-  icon: string;
-}
+import { useUser } from "@clerk/nextjs";
 
 const AVATAR_PRESETS = [
   {
@@ -36,79 +29,26 @@ const AVATAR_PRESETS = [
   }
 ];
 
-// Mirror of DEFAULT_ISSUES from my-issues page — 3 active (In Progress/Under Review/Reported) + 3 resolved
-const DEFAULT_ACTIVE = 3;
-const DEFAULT_RESOLVED = 3;
-const DEFAULT_TOTAL = DEFAULT_ACTIVE + DEFAULT_RESOLVED;
-
 export default function DashboardPage() {
-  const [profileName, setProfileName] = useState("Koushik Jha");
+  const { user } = useUser();
+  const [profileName, setProfileName] = useState("Sagar Pathak");
   const [avatarUrl, setAvatarUrl] = useState("https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150&h=150");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [activeReports, setActiveReports] = useState(DEFAULT_ACTIVE);
-  const [resolvedReports, setResolvedReports] = useState(DEFAULT_RESOLVED);
-  const [totalReports, setTotalReports] = useState(DEFAULT_TOTAL);
-  const [civicPoints, setCivicPoints] = useState(1250);
+
+  const displayName = user?.fullName || user?.firstName || profileName;
+  const displayAvatar = user?.imageUrl || avatarUrl;
 
   useEffect(() => {
     const updateProfile = () => {
-      const storedName = localStorage.getItem("civicvoice_user_name") || "Koushik Jha";
+      const storedName = localStorage.getItem("civicvoice_user_name") || "Sagar Pathak";
       const storedAvatar = localStorage.getItem("civicvoice_avatar_url") || "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150&h=150";
-
-      // Read user-submitted issues from localStorage
-      const storedIssues = localStorage.getItem("civicvoice_user_issues");
-      let userIssues: { id: string; status?: string }[] = [];
-      if (storedIssues) {
-        try {
-          userIssues = JSON.parse(storedIssues);
-        } catch (err) {
-          console.error(err);
-        }
-      }
-
-      // Read deleted issue IDs (same as My Issues page)
-      const storedDeleted = localStorage.getItem("civicvoice_deleted_issues");
-      let deletedIds: string[] = [];
-      if (storedDeleted) {
-        try {
-          deletedIds = JSON.parse(storedDeleted);
-        } catch (err) {
-          console.error(err);
-        }
-      }
-
-      // Filter out deleted user issues
-      const validUserIssues = userIssues.filter((i) => !deletedIds.includes(i.id));
-
-      // Count user issues
-      const userActive = validUserIssues.filter((i) => i.status !== "Resolved").length;
-      const userResolved = validUserIssues.filter((i) => i.status === "Resolved").length;
-
-      // Final counts = default baseline + user-submitted (matches My Issues exactly)
-      const finalActive = DEFAULT_ACTIVE + userActive;
-      const finalResolved = DEFAULT_RESOLVED + userResolved;
-      const finalTotal = DEFAULT_TOTAL + validUserIssues.length;
-
-      // Points: 1250 base + 50 per user-submitted issue (matches My Issues formula)
-      const calculatedPoints = 1250 + (validUserIssues.length * 50);
-
-      setTimeout(() => {
-        setProfileName(storedName);
-        setAvatarUrl(storedAvatar);
-        setActiveReports(finalActive);
-        setResolvedReports(finalResolved);
-        setTotalReports(finalTotal);
-        setCivicPoints(calculatedPoints);
-      }, 0);
+      setProfileName(storedName);
+      setAvatarUrl(storedAvatar);
     };
 
     updateProfile();
     window.addEventListener("profile-updated", updateProfile);
-    window.addEventListener("storage", updateProfile);
-    return () => {
-      window.removeEventListener("profile-updated", updateProfile);
-      window.removeEventListener("storage", updateProfile);
-    };
+    return () => window.removeEventListener("profile-updated", updateProfile);
   }, []);
 
   // State for editing profile modal
@@ -116,16 +56,12 @@ export default function DashboardPage() {
   const [editAvatar, setEditAvatar] = useState("");
   const [customUrlInput, setCustomUrlInput] = useState("");
 
-  // Load and synchronize initial values for editing
-  useEffect(() => {
-    if (isEditModalOpen) {
-      setTimeout(() => {
-        setEditName(profileName);
-        setEditAvatar(avatarUrl);
-        setCustomUrlInput(avatarUrl.startsWith("data:") ? "" : avatarUrl);
-      }, 0);
-    }
-  }, [isEditModalOpen, profileName, avatarUrl]);
+  const openEditModal = () => {
+    setEditName(profileName);
+    setEditAvatar(avatarUrl);
+    setCustomUrlInput(avatarUrl.startsWith("data:") ? "" : avatarUrl);
+    setIsEditModalOpen(true);
+  };
 
   // State for quick support form
   const [issueId, setIssueId] = useState("");
@@ -146,9 +82,9 @@ export default function DashboardPage() {
   return (
     <AppLayout>
       <div className="max-w-[1200px] mx-auto animate-fade-in" style={{ paddingBottom: "40px" }}>
-
+        
         <div
-          className="relative overflow-hidden rounded-3xl p-6 md:p-8 mb-8 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6"
+          className="relative overflow-hidden rounded-3xl p-8 mb-8 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6"
         >
           {/* Unsplash Background Image */}
           <Image
@@ -161,7 +97,7 @@ export default function DashboardPage() {
           />
           {/* Dark Overlay for text legibility */}
           <div className="absolute inset-0 bg-gradient-to-r from-stone-900/85 via-stone-900/50 to-transparent" />
-
+          
           <div className="relative z-10">
             <p className="text-amber-400 text-xs font-black uppercase tracking-wider mb-1.5">
               ● Guru Govind Institutional Block · District 9
@@ -170,14 +106,14 @@ export default function DashboardPage() {
               Welcome back, {profileName}
             </h1>
             <p className="text-white/90 mt-2 text-sm md:text-base max-w-xl">
-              Your community profile is operating cleanly with {activeReports} active report{activeReports !== 1 ? "s" : ""} and {resolvedReports} resolved so far.
+              Your community profile is operating cleanly with 3 active reports and 2 pending polls.
             </p>
           </div>
 
-          <div className="relative z-10 flex flex-col sm:flex-row gap-3 w-full sm:w-auto shrink-0">
+          <div className="relative z-10 flex gap-3 shrink-0">
             <Link
               href="/report"
-              className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-amber-900 bg-white hover:bg-amber-50 hover:scale-105 transition-all duration-300 w-full sm:w-auto"
+              className="flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-amber-900 bg-white hover:bg-amber-50 hover:scale-105 transition-all duration-300"
               style={{ boxShadow: "0 4px 14px rgba(0,0,0,0.15)" }}
             >
               <span className="material-symbols-outlined icon-filled" style={{ fontSize: 18 }}>add_circle</span>
@@ -185,7 +121,7 @@ export default function DashboardPage() {
             </Link>
             <Link
               href="/forum"
-              className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-white border border-white/30 bg-white/10 hover:bg-white/20 transition-all duration-300 w-full sm:w-auto"
+              className="flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-white border border-white/30 bg-white/10 hover:bg-white/20 transition-all duration-300"
             >
               <span className="material-symbols-outlined" style={{ fontSize: 18 }}>forum</span>
               Community Forum
@@ -195,17 +131,17 @@ export default function DashboardPage() {
 
         {/* ── TWO-COLUMN GRID LAYOUT (Main vs Sidebar) ── */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
+          
           {/* ── LEFT COLUMN (Main Stats & Trackers) ── */}
           <div className="lg:col-span-2 flex flex-col gap-8">
-
+            
             {/* Card 1: Civic Impact Summary */}
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 sm:p-8">
-              <div className="flex justify-between items-start gap-3 mb-6">
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8">
+              <div className="flex justify-between items-center mb-6">
                 <div>
                   <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">Total Civic Impact</p>
                   <div className="flex items-baseline gap-3 mt-1.5">
-                    <h2 className="text-3xl sm:text-4xl font-black text-gray-900">{civicPoints.toLocaleString()} Points</h2>
+                    <h2 className="text-4xl font-black text-gray-900">1,250 Points</h2>
                     <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#BBF7D0] text-[#16A34A]">
                       +15.2% this month
                     </span>
@@ -219,15 +155,11 @@ export default function DashboardPage() {
               {/* Sub cards */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {[
-                  { title: "Issues Resolved", count: `${resolvedReports} Fixed`, metric: `${totalReports} total reported`, color: "#B45309", bg: "#FEF3C7", icon: "task_alt", link: "/my-issues?tab=resolved" },
-                  { title: "Polls Participated", count: "12 Voted", metric: "District active", color: "#C2410C", bg: "#FED7AA", icon: "how_to_vote", link: "/polls" },
-                  { title: "Forum Upvotes", count: "180 Likes", metric: "Helpful citizen", color: "#9A3412", bg: "#FDBA74", icon: "thumb_up", link: "/forum" },
+                  { title: "Issues Resolved", count: "3 Fixed", metric: "100% rate", color: "#B45309", bg: "#FEF3C7", icon: "task_alt" },
+                  { title: "Polls Participated", count: "12 Voted", metric: "District active", color: "#C2410C", bg: "#FED7AA", icon: "how_to_vote" },
+                  { title: "Forum Upvotes", count: "180 Likes", metric: "Helpful citizen", color: "#9A3412", bg: "#FDBA74", icon: "thumb_up" },
                 ].map((subCard, idx) => (
-                  <Link
-                    href={subCard.link}
-                    key={idx}
-                    className="bg-[#FAF9F7] rounded-2xl p-5 border border-gray-100 flex flex-col justify-between hover:bg-stone-50 hover:scale-[1.02] active:scale-[0.98] transition-all cursor-pointer"
-                  >
+                  <div key={idx} className="bg-[#FAF9F7] rounded-2xl p-5 border border-gray-100 flex flex-col justify-between">
                     <div>
                       <p className="text-xs text-gray-500 font-bold">{subCard.title}</p>
                       <p className="text-lg font-black text-gray-900 mt-2">{subCard.count}</p>
@@ -238,7 +170,7 @@ export default function DashboardPage() {
                         <span className="material-symbols-outlined icon-filled text-[20px]" style={{ color: subCard.color }}>{subCard.icon}</span>
                       </div>
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
             </div>
@@ -251,10 +183,10 @@ export default function DashboardPage() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Civic Member Pass Card */}
-                <div
+                <div 
                   className="rounded-3xl p-6 text-white relative overflow-hidden flex flex-col justify-between"
-                  style={{
-                    height: 200,
+                  style={{ 
+                    height: 200, 
                     background: "linear-gradient(135deg, #b45309 0%, #d97706 50%, #f59e0b 100%)",
                     boxShadow: "0 10px 25px rgba(217,119,6,0.25)"
                   }}
@@ -325,8 +257,8 @@ export default function DashboardPage() {
                       <span className="text-xs font-bold text-amber-600">{project.progress}%</span>
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden relative">
-                      <div
-                        className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-500"
+                      <div 
+                        className="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-500" 
                         style={{ width: `${project.progress}%` }}
                       />
                     </div>
@@ -344,8 +276,58 @@ export default function DashboardPage() {
           {/* ── RIGHT COLUMN (Fintech Sidebar widgets) ── */}
           <div className="flex flex-col gap-8">
 
+            {/* Widget 0: Dynamic User Profile Card */}
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 flex flex-col items-center text-center relative overflow-hidden">
+              {/* Subtle top banner background */}
+              <div className="absolute top-0 inset-x-0 h-20 bg-gradient-to-r from-amber-500/20 to-orange-500/20" />
+              
+              {/* Avatar with hover state */}
+              <button 
+                onClick={openEditModal}
+                className="group relative w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-md z-10 mt-6 cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-500"
+              >
+                <Image 
+                  src={displayAvatar} 
+                  alt={displayName} 
+                  fill 
+                  loading="lazy"
+                  className="object-cover transition-transform duration-300 group-hover:scale-110"
+                  unoptimized
+                />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
+                  <span className="material-symbols-outlined text-white text-[20px]">photo_camera</span>
+                </div>
+              </button>
 
+              <div className="mt-4 z-10">
+                <h3 className="text-lg font-black text-stone-900 flex items-center justify-center gap-1.5">
+                  {displayName}
+                  <span className="material-symbols-outlined text-amber-500 text-[18px] icon-filled">verified</span>
+                </h3>
+                <p className="text-xs text-stone-500 font-medium mt-0.5">District 9 Active Representative</p>
+              </div>
 
+              {/* Dynamic details */}
+              <div className="grid grid-cols-2 gap-4 w-full mt-6 pt-4 border-t border-gray-100">
+                <div className="text-left">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Civic Impact</p>
+                  <p className="text-sm font-black text-stone-800 mt-0.5">1,250 Points</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">District Rank</p>
+                  <p className="text-sm font-black text-amber-600 mt-0.5">#42 of 12.4k</p>
+                </div>
+              </div>
+
+              <button
+                onClick={openEditModal}
+                className="w-full mt-5 py-2.5 px-4 rounded-xl border border-amber-200 bg-amber-50/50 hover:bg-amber-50 text-amber-700 font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+              >
+                <span className="material-symbols-outlined text-[14px]">edit</span>
+                Edit Profile Settings
+              </button>
+            </div>
+            
             {/* Widget 1: Instant P2P Transfer (Fintech Form adapted to Civic Issue Support) */}
             <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
@@ -416,7 +398,7 @@ export default function DashboardPage() {
                       <span className="text-xs font-black text-amber-600 shrink-0">{task.reward}</span>
                     </div>
                     <div className="flex items-center mt-1">
-                      <span
+                      <span 
                         className={`text-[9px] font-black border px-2 py-0.5 rounded-full ${task.tagColor}`}
                       >
                         {task.tag}
@@ -440,7 +422,7 @@ export default function DashboardPage() {
             {/* Header */}
             <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
               <h3 className="text-lg font-black text-stone-900">Edit Profile</h3>
-              <button
+              <button 
                 onClick={() => setIsEditModalOpen(false)}
                 className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 text-stone-400 hover:text-stone-600 transition-colors"
               >
@@ -453,23 +435,24 @@ export default function DashboardPage() {
               {/* Profile Image Preview & File Upload */}
               <div className="flex flex-col items-center gap-3">
                 <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-amber-100 shadow-inner">
-                  <Image
-                    src={editAvatar}
-                    alt="Preview"
-                    fill
+                  <Image 
+                    src={editAvatar} 
+                    alt="Preview" 
+                    fill 
+                    loading="lazy"
                     className="object-cover"
                     unoptimized
                   />
                 </div>
-
+                
                 {/* Upload Button */}
                 <label className="cursor-pointer px-4 py-1.5 rounded-lg border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs transition-colors flex items-center gap-1.5">
                   <span className="material-symbols-outlined text-[14px]">upload</span>
                   Upload Custom Photo
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    className="hidden" 
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
@@ -494,7 +477,7 @@ export default function DashboardPage() {
                   value={editName}
                   onChange={(e) => setEditName(e.target.value)}
                   className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-sm text-stone-800"
-                  placeholder="e.g. Koushik Jha"
+                  placeholder="e.g. Sagar Pathak"
                   required
                 />
               </div>
@@ -513,14 +496,16 @@ export default function DashboardPage() {
                           setEditAvatar(preset.url);
                           setCustomUrlInput(preset.url);
                         }}
-                        className={`group relative aspect-square rounded-2xl overflow-hidden border-2 transition-all cursor-pointer ${isSelected ? "border-amber-500 scale-95 ring-4 ring-amber-500/10" : "border-gray-200 hover:border-gray-300"
-                          }`}
+                        className={`group relative aspect-square rounded-2xl overflow-hidden border-2 transition-all cursor-pointer ${
+                          isSelected ? "border-amber-500 scale-95 ring-4 ring-amber-500/10" : "border-gray-200 hover:border-gray-300"
+                        }`}
                         title={preset.name}
                       >
-                        <Image
-                          src={preset.url}
-                          alt={preset.name}
-                          fill
+                        <Image 
+                          src={preset.url} 
+                          alt={preset.name} 
+                          fill 
+                          loading="lazy"
                           className="object-cover"
                           unoptimized
                         />
@@ -565,7 +550,7 @@ export default function DashboardPage() {
               <button
                 type="button"
                 onClick={() => {
-                  localStorage.setItem("civicvoice_user_name", editName.trim() || "Koushik Jha");
+                  localStorage.setItem("civicvoice_user_name", editName.trim() || "Sagar Pathak");
                   localStorage.setItem("civicvoice_avatar_url", editAvatar || "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150&h=150");
                   window.dispatchEvent(new Event("profile-updated"));
                   setIsEditModalOpen(false);

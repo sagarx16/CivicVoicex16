@@ -24,22 +24,22 @@ const pointHistory = [
 ];
 
 const leaderboard = [
-  { name: "Alexandra W.", points: 3420, rank: 1, avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=150&h=150", bg: "from-yellow-400 to-amber-500" },
-  { name: "Marcus T.", points: 2890, rank: 2, avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150&h=150", bg: "from-gray-300 to-gray-400" },
+  { name: "Alexandra W.", points: 3420, rank: 1, avatar: null, bg: "from-yellow-400 to-amber-500" },
+  { name: "Marcus T.", points: 2890, rank: 2, avatar: null, bg: "from-gray-300 to-gray-400" },
   { name: "Priya N.", points: 2150, rank: 3, avatar: "/avatar_woman.jpg", bg: "from-orange-300 to-orange-400" },
-  { name: "You (Koushik Jha)", points: 1250, rank: 42, avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150&h=150", isMe: true, bg: "from-amber-400 to-orange-500" },
+  { name: "You (Sagar Pathak)", points: 1250, rank: 42, avatar: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150&h=150", isMe: true, bg: "from-amber-400 to-orange-500" },
 ];
 
 const earned = badges.filter((b) => b.earned);
 const upcoming = badges.filter((b) => !b.earned);
 
 export default function RewardsPage() {
-  const [profileName, setProfileName] = useState("Koushik Jha");
+  const [profileName, setProfileName] = useState("Sagar Pathak");
   const [avatarUrl, setAvatarUrl] = useState("https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150&h=150");
 
   useEffect(() => {
     const updateProfile = () => {
-      const storedName = localStorage.getItem("civicvoice_user_name") || "Koushik Jha";
+      const storedName = localStorage.getItem("civicvoice_user_name") || "Sagar Pathak";
       const storedAvatar = localStorage.getItem("civicvoice_avatar_url") || "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150&h=150";
       setProfileName(storedName);
       setAvatarUrl(storedAvatar);
@@ -71,24 +71,25 @@ export default function RewardsPage() {
             alt="Badges"
             fill
             className="object-cover"
+            loading="lazy"
             unoptimized
           />
           <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(133,83,0,0.85) 0%, rgba(180,83,9,0.75) 100%)" }} />
-          <div className="relative z-10 p-5 md:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 md:gap-6">
+          <div className="relative z-10 p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             <div>
-              <p className="text-white/70 text-xs md:text-sm font-medium uppercase tracking-wider mb-1">Total Civic Points</p>
-              <p className="text-4xl md:text-6xl font-extrabold text-white leading-none">1,250</p>
-              <p className="text-white/80 mt-1 md:mt-2 text-sm md:text-base">Ranked <strong>#42</strong> in District 9</p>
+              <p className="text-white/70 text-sm font-medium uppercase tracking-wider mb-1">Total Civic Points</p>
+              <p className="text-6xl font-extrabold text-white leading-none">1,250</p>
+              <p className="text-white/80 mt-2">Ranked <strong>#42</strong> in District 9</p>
             </div>
-            <div className="flex gap-5 md:gap-8">
+            <div className="flex gap-8">
               {[
                 { value: earned.length, label: "Badges" },
                 { value: "4", label: "Reports" },
                 { value: "12", label: "Polls" },
               ].map((s) => (
                 <div key={s.label} className="text-center">
-                  <p className="text-2xl md:text-3xl font-extrabold text-white">{s.value}</p>
-                  <p className="text-white/60 text-xs md:text-sm">{s.label}</p>
+                  <p className="text-3xl font-extrabold text-white">{s.value}</p>
+                  <p className="text-white/60 text-sm">{s.label}</p>
                 </div>
               ))}
             </div>
@@ -170,7 +171,7 @@ export default function RewardsPage() {
                     </span>
                     <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 relative">
                       {user.avatar ? (
-                        <Image src={user.avatar} alt={user.name} width={32} height={32} className="object-cover w-full h-full" unoptimized />
+                        <Image src={user.avatar} alt={user.name} width={32} height={32} loading="lazy" className="object-cover w-full h-full" unoptimized />
                       ) : (
                         <div className={`w-full h-full bg-gradient-to-br ${user.bg} flex items-center justify-center`}>
                           <span className="text-white text-xs font-bold">{user.name.split(" ").map(n => n[0]).join("").slice(0,2)}</span>
