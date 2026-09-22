@@ -136,39 +136,61 @@ export default function DashboardPage() {
           <div className="lg:col-span-2 flex flex-col gap-8">
             
             {/* Card 1: Civic Impact Summary */}
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-8">
-              <div className="flex justify-between items-center mb-6">
-                <div>
-                  <p className="text-gray-400 text-xs font-bold uppercase tracking-widest">Total Civic Impact</p>
-                  <div className="flex items-baseline gap-3 mt-1.5">
-                    <h2 className="text-4xl font-black text-gray-900">1,250 Points</h2>
-                    <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-[#BBF7D0] text-[#16A34A]">
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-4 sm:p-7 md:p-8">
+              <div className="flex items-start justify-between gap-3 mb-5 sm:mb-6">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap mb-1">
+                    <p className="text-gray-400 text-[10px] sm:text-xs font-bold uppercase tracking-widest">
+                      Total Civic Impact
+                    </p>
+                    <span className="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded-full bg-[#BBF7D0] text-[#16A34A] inline-flex items-center gap-1 shrink-0">
+                      <span className="material-symbols-outlined text-[13px] font-bold">trending_up</span>
                       +15.2% this month
                     </span>
                   </div>
+                  <h2 className="text-2xl sm:text-4xl font-black text-gray-900 tracking-tight leading-tight flex items-baseline gap-1.5 sm:gap-2">
+                    <span>1,250</span>
+                    <span className="text-base sm:text-2xl font-bold text-amber-600">Points</span>
+                  </h2>
                 </div>
-                <div className="w-12 h-12 flex items-center justify-center shrink-0">
-                  <span className="material-symbols-outlined icon-filled text-amber-500" style={{ fontSize: 32 }}>military_tech</span>
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-amber-50 border border-amber-200/70 flex items-center justify-center shrink-0 shadow-xs">
+                  <span className="material-symbols-outlined icon-filled text-amber-500 text-[24px] sm:text-[30px]">military_tech</span>
                 </div>
               </div>
 
-              {/* Sub cards */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Sub cards: 3-column compact KPI grid on mobile, spacious on tablet/desktop */}
+              <div className="grid grid-cols-3 gap-2 sm:gap-4">
                 {[
-                  { title: "Issues Resolved", count: "3 Fixed", metric: "100% rate", color: "#B45309", bg: "#FEF3C7", icon: "task_alt" },
-                  { title: "Polls Participated", count: "12 Voted", metric: "District active", color: "#C2410C", bg: "#FED7AA", icon: "how_to_vote" },
-                  { title: "Forum Upvotes", count: "180 Likes", metric: "Helpful citizen", color: "#9A3412", bg: "#FDBA74", icon: "thumb_up" },
+                  { title: "Issues Resolved", shortTitle: "Issues", count: "3 Fixed", metric: "100% rate", color: "#B45309", bg: "#FEF3C7", icon: "task_alt" },
+                  { title: "Polls Participated", shortTitle: "Polls", count: "12 Voted", metric: "District active", color: "#C2410C", bg: "#FED7AA", icon: "how_to_vote" },
+                  { title: "Forum Upvotes", shortTitle: "Upvotes", count: "180 Likes", metric: "Helpful citizen", color: "#9A3412", bg: "#FDBA74", icon: "thumb_up" },
                 ].map((subCard, idx) => (
-                  <div key={idx} className="bg-[#FAF9F7] rounded-2xl p-5 border border-gray-100 flex flex-col justify-between">
+                  <div 
+                    key={idx} 
+                    className="bg-[#FAF9F7] rounded-2xl p-2.5 sm:p-5 border border-gray-100 flex flex-col justify-between hover:bg-amber-50/40 transition-colors"
+                  >
                     <div>
-                      <p className="text-xs text-gray-500 font-bold">{subCard.title}</p>
-                      <p className="text-lg font-black text-gray-900 mt-2">{subCard.count}</p>
-                    </div>
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-200/50">
-                      <span className="text-[11px] text-gray-400 font-semibold">{subCard.metric}</span>
-                      <div className="w-6 h-6 flex items-center justify-center shrink-0">
-                        <span className="material-symbols-outlined icon-filled text-[20px]" style={{ color: subCard.color }}>{subCard.icon}</span>
+                      <div className="flex items-center justify-between mb-2">
+                        <div 
+                          className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center shrink-0" 
+                          style={{ backgroundColor: subCard.bg }}
+                        >
+                          <span className="material-symbols-outlined icon-filled text-[16px] sm:text-[20px]" style={{ color: subCard.color }}>
+                            {subCard.icon}
+                          </span>
+                        </div>
+                        <span className="hidden sm:inline text-[11px] text-gray-400 font-semibold">{subCard.metric}</span>
                       </div>
+                      <p className="text-xs sm:text-lg font-black text-gray-900 leading-tight">
+                        {subCard.count}
+                      </p>
+                      <p className="text-[10px] sm:text-xs text-gray-500 font-bold mt-0.5 truncate">
+                        <span className="hidden sm:inline">{subCard.title}</span>
+                        <span className="sm:hidden">{subCard.shortTitle}</span>
+                      </p>
+                    </div>
+                    <div className="sm:hidden mt-1.5 pt-1.5 border-t border-gray-200/50">
+                      <span className="text-[9px] text-gray-400 font-medium truncate block">{subCard.metric}</span>
                     </div>
                   </div>
                 ))}
