@@ -96,7 +96,7 @@ export default function ForumPage() {
             fill
             className="object-cover"
             priority
-            unoptimized
+            sizes="(max-width: 800px) 100vw, 800px"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 via-stone-900/30 to-transparent" />
           <div className="absolute bottom-6 left-6 right-6 flex flex-col md:flex-row md:items-end justify-between gap-4 text-white z-10">
@@ -206,7 +206,7 @@ export default function ForumPage() {
                         fill
                         className="object-cover"
                         loading="lazy"
-                        unoptimized
+                        sizes="(max-width: 800px) 100vw, 800px"
                       />
                     </div>
                   )}

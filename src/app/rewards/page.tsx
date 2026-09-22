@@ -72,7 +72,7 @@ export default function RewardsPage() {
             fill
             className="object-cover"
             loading="lazy"
-            unoptimized
+            sizes="(max-width: 1040px) 100vw, 1040px"
           />
           <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(133,83,0,0.85) 0%, rgba(180,83,9,0.75) 100%)" }} />
           <div className="relative z-10 p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
@@ -171,7 +171,7 @@ export default function RewardsPage() {
                     </span>
                     <div className="w-8 h-8 rounded-full overflow-hidden shrink-0 relative">
                       {user.avatar ? (
-                        <Image src={user.avatar} alt={user.name} width={32} height={32} loading="lazy" className="object-cover w-full h-full" unoptimized />
+                        <Image src={user.avatar} alt={user.name} width={32} height={32} loading="lazy" className="object-cover w-full h-full" />
                       ) : (
                         <div className={`w-full h-full bg-gradient-to-br ${user.bg} flex items-center justify-center`}>
                           <span className="text-white text-xs font-bold">{user.name.split(" ").map(n => n[0]).join("").slice(0,2)}</span>
