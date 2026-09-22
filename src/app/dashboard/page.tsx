@@ -6,62 +6,21 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/nextjs";
 
-const AVATAR_PRESETS = [
-  {
-    id: "preset-executive",
-    name: "Smart Student (Default)",
-    url: "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150&h=150"
-  },
-  {
-    id: "preset-director",
-    name: "Tech Director",
-    url: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=150&h=150"
-  },
-  {
-    id: "preset-lead",
-    name: "Community Liaison",
-    url: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=150&h=150"
-  },
-  {
-    id: "preset-advocate",
-    name: "Public Advocate",
-    url: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150&h=150"
-  }
-];
-
 export default function DashboardPage() {
   const { user } = useUser();
   const [profileName, setProfileName] = useState("Sagar Pathak");
-  const [avatarUrl, setAvatarUrl] = useState("https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150&h=150");
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
   const displayName = user?.fullName || user?.firstName || profileName;
-  const displayAvatar = user?.imageUrl || avatarUrl;
 
   useEffect(() => {
     const updateProfile = () => {
       const storedName = localStorage.getItem("civicvoice_user_name") || "Sagar Pathak";
-      const storedAvatar = localStorage.getItem("civicvoice_avatar_url") || "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150&h=150";
       setProfileName(storedName);
-      setAvatarUrl(storedAvatar);
     };
 
     updateProfile();
     window.addEventListener("profile-updated", updateProfile);
     return () => window.removeEventListener("profile-updated", updateProfile);
   }, []);
-
-  // State for editing profile modal
-  const [editName, setEditName] = useState("");
-  const [editAvatar, setEditAvatar] = useState("");
-  const [customUrlInput, setCustomUrlInput] = useState("");
-
-  const openEditModal = () => {
-    setEditName(profileName);
-    setEditAvatar(avatarUrl);
-    setCustomUrlInput(avatarUrl.startsWith("data:") ? "" : avatarUrl);
-    setIsEditModalOpen(true);
-  };
 
   // State for quick support form
   const [issueId, setIssueId] = useState("");
@@ -297,59 +256,6 @@ export default function DashboardPage() {
 
           {/* ── RIGHT COLUMN (Fintech Sidebar widgets) ── */}
           <div className="flex flex-col gap-8">
-
-            {/* Widget 0: Dynamic User Profile Card */}
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6 flex flex-col items-center text-center relative overflow-hidden">
-              {/* Subtle top banner background */}
-              <div className="absolute top-0 inset-x-0 h-20 bg-gradient-to-r from-amber-500/20 to-orange-500/20" />
-              
-              {/* Avatar with hover state */}
-              <button 
-                onClick={openEditModal}
-                className="group relative w-20 h-20 rounded-full overflow-hidden border-4 border-white shadow-md z-10 mt-6 cursor-pointer focus:outline-none focus:ring-2 focus:ring-amber-500"
-              >
-                <Image 
-                  src={displayAvatar} 
-                  alt={displayName} 
-                  fill 
-                  loading="lazy"
-                  className="object-cover transition-transform duration-300 group-hover:scale-110"
-                  unoptimized
-                />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
-                  <span className="material-symbols-outlined text-white text-[20px]">photo_camera</span>
-                </div>
-              </button>
-
-              <div className="mt-4 z-10">
-                <h3 className="text-lg font-black text-stone-900 flex items-center justify-center gap-1.5">
-                  {displayName}
-                  <span className="material-symbols-outlined text-amber-500 text-[18px] icon-filled">verified</span>
-                </h3>
-                <p className="text-xs text-stone-500 font-medium mt-0.5">District 9 Active Representative</p>
-              </div>
-
-              {/* Dynamic details */}
-              <div className="grid grid-cols-2 gap-4 w-full mt-6 pt-4 border-t border-gray-100">
-                <div className="text-left">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Civic Impact</p>
-                  <p className="text-sm font-black text-stone-800 mt-0.5">1,250 Points</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">District Rank</p>
-                  <p className="text-sm font-black text-amber-600 mt-0.5">#42 of 12.4k</p>
-                </div>
-              </div>
-
-              <button
-                onClick={openEditModal}
-                className="w-full mt-5 py-2.5 px-4 rounded-xl border border-amber-200 bg-amber-50/50 hover:bg-amber-50 text-amber-700 font-bold text-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                <span className="material-symbols-outlined text-[14px]">edit</span>
-                Edit Profile Settings
-              </button>
-            </div>
-            
             {/* Widget 1: Instant P2P Transfer (Fintech Form adapted to Civic Issue Support) */}
             <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
@@ -436,159 +342,6 @@ export default function DashboardPage() {
         </div>
 
       </div>
-
-      {/* ── PROFILE EDIT MODAL ── */}
-      {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-gray-100 flex flex-col max-h-[90vh]">
-            {/* Header */}
-            <div className="flex justify-between items-center px-6 py-4 border-b border-gray-100">
-              <h3 className="text-lg font-black text-stone-900">Edit Profile</h3>
-              <button 
-                onClick={() => setIsEditModalOpen(false)}
-                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 text-stone-400 hover:text-stone-600 transition-colors"
-              >
-                <span className="material-symbols-outlined text-[20px]">close</span>
-              </button>
-            </div>
-
-            {/* Content (Scrollable) */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              {/* Profile Image Preview & File Upload */}
-              <div className="flex flex-col items-center gap-3">
-                <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-amber-100 shadow-inner">
-                  <Image 
-                    src={editAvatar} 
-                    alt="Preview" 
-                    fill 
-                    loading="lazy"
-                    className="object-cover"
-                    unoptimized
-                  />
-                </div>
-                
-                {/* Upload Button */}
-                <label className="cursor-pointer px-4 py-1.5 rounded-lg border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-700 font-bold text-xs transition-colors flex items-center gap-1.5">
-                  <span className="material-symbols-outlined text-[14px]">upload</span>
-                  Upload Custom Photo
-                  <input 
-                    type="file" 
-                    accept="image/*" 
-                    className="hidden" 
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          if (typeof reader.result === "string") {
-                            setEditAvatar(reader.result);
-                          }
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
-                  />
-                </label>
-              </div>
-
-              {/* Name Input */}
-              <div>
-                <label className="block text-xs font-bold text-stone-700 uppercase mb-1.5">Full Name</label>
-                <input
-                  type="text"
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-sm text-stone-800"
-                  placeholder="e.g. Sagar Pathak"
-                  required
-                />
-              </div>
-
-              {/* Unsplash Presets */}
-              <div>
-                <label className="block text-xs font-bold text-stone-700 uppercase mb-2">Professional Presets (Unsplash)</label>
-                <div className="grid grid-cols-4 gap-3">
-                  {AVATAR_PRESETS.map((preset) => {
-                    const isSelected = editAvatar === preset.url;
-                    return (
-                      <button
-                        key={preset.id}
-                        type="button"
-                        onClick={() => {
-                          setEditAvatar(preset.url);
-                          setCustomUrlInput(preset.url);
-                        }}
-                        className={`group relative aspect-square rounded-2xl overflow-hidden border-2 transition-all cursor-pointer ${
-                          isSelected ? "border-amber-500 scale-95 ring-4 ring-amber-500/10" : "border-gray-200 hover:border-gray-300"
-                        }`}
-                        title={preset.name}
-                      >
-                        <Image 
-                          src={preset.url} 
-                          alt={preset.name} 
-                          fill 
-                          loading="lazy"
-                          className="object-cover"
-                          unoptimized
-                        />
-                        {isSelected && (
-                          <div className="absolute inset-0 bg-amber-500/20 flex items-center justify-center">
-                            <span className="material-symbols-outlined text-white text-[16px] font-bold">check</span>
-                          </div>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Custom Image URL */}
-              <div>
-                <label className="block text-xs font-bold text-stone-700 uppercase mb-1.5">Or Paste Custom Image URL</label>
-                <input
-                  type="url"
-                  value={customUrlInput}
-                  onChange={(e) => {
-                    setCustomUrlInput(e.target.value);
-                    if (e.target.value.trim()) {
-                      setEditAvatar(e.target.value.trim());
-                    }
-                  }}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20 text-sm text-stone-800"
-                  placeholder="https://images.unsplash.com/photo-..."
-                />
-              </div>
-            </div>
-
-            {/* Footer */}
-            <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
-              <button
-                type="button"
-                onClick={() => setIsEditModalOpen(false)}
-                className="px-4 py-2.5 rounded-xl border border-gray-200 hover:bg-gray-100 text-stone-600 font-bold text-sm transition-colors cursor-pointer"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  localStorage.setItem("civicvoice_user_name", editName.trim() || "Sagar Pathak");
-                  localStorage.setItem("civicvoice_avatar_url", editAvatar || "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?auto=format&fit=crop&q=80&w=150&h=150");
-                  window.dispatchEvent(new Event("profile-updated"));
-                  setIsEditModalOpen(false);
-                }}
-                className="px-5 py-2.5 rounded-xl text-white font-bold text-sm transition-all shadow-md cursor-pointer"
-                style={{
-                  background: "linear-gradient(135deg, #F59E0B 0%, #EA580C 100%)",
-                  boxShadow: "0 3px 8px rgba(245,158,11,0.2)"
-                }}
-              >
-                Save Changes
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </AppLayout>
   );
 }
