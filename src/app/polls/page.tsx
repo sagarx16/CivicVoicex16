@@ -123,7 +123,7 @@ export default function PollsPage() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-5 sm:gap-6">
           {polls.map((poll) => {
             const hasVoted = votedPolls[poll.id] !== undefined;
             const userVoteIdx = votedPolls[poll.id];
@@ -131,35 +131,35 @@ export default function PollsPage() {
             return (
               <div
                 key={poll.id}
-                className="civic-card p-6 border-l-4 transition-all duration-300 hover:shadow-hover"
+                className="civic-card p-4 sm:p-6 border-l-4 transition-all duration-300 hover:shadow-hover"
                 style={{ borderLeftColor: poll.theme.borderHex }}
               >
-                <div className="flex items-start gap-4 mb-5">
-                  <div className="w-12 h-12 flex items-center justify-center shrink-0 transition-transform duration-300 hover:scale-110">
-                    <span className={`material-symbols-outlined icon-filled ${poll.theme.primaryText} text-[32px]`}>
+                <div className="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-5">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center shrink-0 transition-transform duration-300 hover:scale-110">
+                    <span className={`material-symbols-outlined icon-filled ${poll.theme.primaryText} text-[26px] sm:text-[32px]`}>
                       {poll.icon}
                     </span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start gap-3 justify-between">
-                      <h2 className="text-headline-sm font-semibold text-on-surface leading-snug">
+                    <div className="flex items-start gap-2.5 sm:gap-3 justify-between">
+                      <h2 className="text-base sm:text-headline-sm font-semibold text-on-surface leading-snug">
                         {poll.title}
                       </h2>
-                      <div className="flex flex-col items-end gap-1.5 shrink-0">
-                        <span className={`text-label-sm font-semibold px-2.5 py-0.5 rounded-full ${poll.theme.badge}`}>
+                      <div className="flex flex-col items-end gap-1 shrink-0">
+                        <span className={`text-[10px] sm:text-label-sm font-semibold px-2 sm:px-2.5 py-0.5 rounded-full ${poll.theme.badge}`}>
                           {poll.daysLeft}d left
                         </span>
-                        <span className="text-label-sm text-on-surface-variant bg-surface-container px-2.5 py-0.5 rounded-full font-medium">
+                        <span className="text-[10px] sm:text-label-sm text-on-surface-variant bg-surface-container px-2 sm:px-2.5 py-0.5 rounded-full font-medium">
                           {poll.category}
                         </span>
                       </div>
                     </div>
-                    <p className="text-body-sm text-on-surface-variant mt-2 leading-relaxed">{poll.description}</p>
+                    <p className="text-xs sm:text-body-sm text-on-surface-variant mt-1.5 sm:mt-2 leading-relaxed">{poll.description}</p>
                   </div>
                 </div>
 
                 {/* Options */}
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-2.5 sm:gap-3">
                   {poll.options.map((opt, i) => (
                     <button
                       key={i}
@@ -172,7 +172,7 @@ export default function PollsPage() {
                             ? `${poll.theme.border} bg-surface-container-lowest` 
                             : "border-outline-variant/30 bg-surface-container-lowest"
                           : "border-outline-variant/50 hover:border-primary hover:shadow-subtle bg-white cursor-pointer"
-                      } p-4`}
+                      } p-3 sm:p-4`}
                     >
                       <div className="flex items-center justify-between gap-3">
                         <div className="flex items-center gap-3">

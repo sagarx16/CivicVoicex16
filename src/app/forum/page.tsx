@@ -89,7 +89,7 @@ export default function ForumPage() {
     <AppLayout>
       <div className="max-w-[800px] mx-auto animate-fade-in">
         {/* Forum Banner */}
-        <div className="relative w-full h-48 md:h-64 rounded-3xl overflow-hidden mb-6 shadow-md border border-[#F0E4D7]">
+        <div className="relative w-full h-44 sm:h-48 md:h-64 rounded-3xl overflow-hidden mb-6 shadow-md border border-[#F0E4D7]">
           <Image
             src="https://images.unsplash.com/photo-1543269865-cbf427effbad?auto=format&fit=crop&q=80&w=1000"
             alt="Community Forum Banner"
@@ -99,20 +99,20 @@ export default function ForumPage() {
             sizes="(max-width: 800px) 100vw, 800px"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-stone-900/80 via-stone-900/30 to-transparent" />
-          <div className="absolute bottom-6 left-6 right-6 flex flex-col md:flex-row md:items-end justify-between gap-4 text-white z-10">
+          <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6 sm:right-6 flex flex-col md:flex-row md:items-end justify-between gap-3 sm:gap-4 text-white z-10">
             <div>
-              <span className="bg-amber-500 text-[10px] font-extrabold tracking-widest uppercase px-2.5 py-1 rounded-full text-white mb-2 inline-block">
+              <span className="bg-amber-500 text-[10px] font-extrabold tracking-widest uppercase px-2.5 py-1 rounded-full text-white mb-1.5 sm:mb-2 inline-block">
                 Interactive Forum
               </span>
-              <h1 className="text-2xl md:text-4xl font-black text-white leading-tight tracking-tight">
+              <h1 className="text-xl sm:text-2xl md:text-4xl font-black text-white leading-tight tracking-tight">
                 Community Forum
               </h1>
-              <p className="text-sm md:text-base text-stone-200 mt-1 max-w-md">
+              <p className="text-xs sm:text-sm md:text-base text-stone-200 mt-1 max-w-md">
                 Discuss local issues and ideas with your neighbors in real time
               </p>
             </div>
-            <button className="flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white text-sm font-bold py-3 px-5 rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 shrink-0 self-start md:self-auto cursor-pointer">
-              <span className="material-symbols-outlined icon-filled text-[18px]">edit</span>
+            <button className="flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 text-white text-xs sm:text-sm font-bold py-2.5 sm:py-3 px-4 sm:px-5 rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 shrink-0 self-start md:self-auto cursor-pointer">
+              <span className="material-symbols-outlined icon-filled text-[16px] sm:text-[18px]">edit</span>
               New Post
             </button>
           </div>
@@ -163,7 +163,7 @@ export default function ForumPage() {
           {filtered.map((thread, i) => (
             <div
               key={thread.id}
-              className={`civic-card p-5 cursor-pointer ${thread.pinned ? "border-l-4 border-l-primary-container" : ""}`}
+              className={`civic-card p-4 sm:p-5 cursor-pointer ${thread.pinned ? "border-l-4 border-l-primary-container" : ""}`}
             >
               {thread.pinned && (
                 <div className="flex items-center gap-1 text-label-sm text-primary mb-2">
@@ -178,18 +178,18 @@ export default function ForumPage() {
                 </div>
               )}
 
-              <div className="flex gap-4">
+              <div className="flex gap-3 sm:gap-4">
                 <div
-                  className={`w-10 h-10 rounded-full ${avatarColors[i % avatarColors.length]} flex items-center justify-center shrink-0`}
+                  className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full ${avatarColors[i % avatarColors.length]} flex items-center justify-center shrink-0 text-xs sm:text-label-sm font-bold text-on-surface`}
                 >
-                  <span className="text-label-sm font-bold text-on-surface">{thread.avatar}</span>
+                  {thread.avatar}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
                     <h2 className="text-body-md font-semibold text-on-surface leading-snug">
                       {thread.title}
                     </h2>
-                    <span className="text-label-sm bg-surface-container px-2 py-0.5 rounded-full whitespace-nowrap text-on-surface-variant shrink-0">
+                    <span className="text-[10px] sm:text-label-sm bg-surface-container px-2 py-0.5 rounded-full whitespace-nowrap text-on-surface-variant shrink-0">
                       {thread.category}
                     </span>
                   </div>
@@ -199,7 +199,7 @@ export default function ForumPage() {
                   </p>
 
                   {thread.img && (
-                    <div className="relative w-full h-48 mt-3 rounded-xl overflow-hidden">
+                    <div className="relative w-full h-40 sm:h-48 mt-3 rounded-xl overflow-hidden">
                       <Image
                         src={thread.img}
                         alt={thread.title}
@@ -211,14 +211,14 @@ export default function ForumPage() {
                     </div>
                   )}
 
-                  <div className="flex items-center gap-4 mt-3">
+                  <div className="flex items-center gap-3 sm:gap-4 mt-3 flex-wrap">
                     <span className="text-label-sm text-on-surface-variant">{thread.author}</span>
                     <span className="text-label-sm text-on-surface-variant">{thread.time}</span>
-                    <button className="flex items-center gap-1 text-label-sm text-on-surface-variant hover:text-primary transition-colors">
+                    <button className="flex items-center gap-1 text-label-sm text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
                       <span className="material-symbols-outlined text-[14px]">thumb_up</span>
                       {thread.upvotes}
                     </button>
-                    <button className="flex items-center gap-1 text-label-sm text-on-surface-variant hover:text-primary transition-colors">
+                    <button className="flex items-center gap-1 text-label-sm text-on-surface-variant hover:text-primary transition-colors cursor-pointer">
                       <span className="material-symbols-outlined text-[14px]">chat_bubble</span>
                       {thread.replies}
                     </button>

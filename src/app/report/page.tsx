@@ -90,13 +90,13 @@ function ReportForm() {
         </p>
       </div>
 
-      <form className="flex flex-col gap-6" onSubmit={(e) => e.preventDefault()}>
+      <form className="flex flex-col gap-5 sm:gap-6" onSubmit={(e) => e.preventDefault()}>
           {/* Category */}
-          <div className="civic-card p-6">
+          <div className="civic-card p-4 sm:p-6">
             <h2 className="text-headline-sm font-semibold text-on-surface mb-4">
               Issue Category
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
               {categories.map((cat) => {
                 const isSelected = selectedCategory === cat.id;
                 return (
@@ -110,15 +110,15 @@ function ReportForm() {
                       color: isSelected ? cat.color : "#4B5563",
                       boxShadow: isSelected ? `0 4px 12px ${cat.color}15` : "none",
                     }}
-                    className="group flex flex-col items-center gap-3 p-4 rounded-2xl border-2 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
+                    className="group flex flex-col items-center gap-2.5 sm:gap-3 p-3 sm:p-4 rounded-2xl border-2 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
                   >
                     <div 
-                      className="w-12 h-12 flex items-center justify-center transition-transform duration-200 group-hover:scale-110"
+                      className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center transition-transform duration-200 group-hover:scale-110"
                       style={{
                         color: cat.color,
                       }}
                     >
-                      <span className={`material-symbols-outlined ${isSelected ? "icon-filled" : ""} text-[32px]`}>
+                      <span className={`material-symbols-outlined ${isSelected ? "icon-filled" : ""} text-[28px] sm:text-[32px]`}>
                         {cat.icon}
                       </span>
                     </div>
@@ -130,7 +130,7 @@ function ReportForm() {
           </div>
 
           {/* Description */}
-          <div className="civic-card p-6">
+          <div className="civic-card p-4 sm:p-6">
             <h2 className="text-headline-sm font-semibold text-on-surface mb-4">
               Issue Details
             </h2>
@@ -180,7 +180,7 @@ function ReportForm() {
           </div>
 
           {/* Location */}
-          <div className="civic-card p-6">
+          <div className="civic-card p-4 sm:p-6">
             <h2 className="text-headline-sm font-semibold text-on-surface mb-4">
               Location
             </h2>
@@ -242,12 +242,12 @@ function ReportForm() {
           </div>
 
           {/* Photo upload */}
-          <div className="civic-card p-6">
+          <div className="civic-card p-4 sm:p-6">
             <h2 className="text-headline-sm font-semibold text-on-surface mb-4">
               Add Photos (optional)
             </h2>
-            <div className="border-2 border-dashed border-outline-variant rounded-lg p-8 text-center hover:border-primary-container hover:bg-primary-fixed/10 transition-all cursor-pointer">
-              <span className="material-symbols-outlined text-on-surface-variant text-[40px]">
+            <div className="border-2 border-dashed border-outline-variant rounded-lg p-5 sm:p-8 text-center hover:border-primary-container hover:bg-primary-fixed/10 transition-all cursor-pointer">
+              <span className="material-symbols-outlined text-on-surface-variant text-[36px] sm:text-[40px]">
                 add_photo_alternate
               </span>
               <p className="text-body-md text-on-surface-variant mt-2">
@@ -264,16 +264,16 @@ function ReportForm() {
           </div>
 
           {/* Submit */}
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <button
               type="button"
-              className="flex-1 py-3 px-4 border border-outline-variant rounded-lg text-label-md font-semibold text-on-surface hover:bg-surface-container transition-colors"
+              className="w-full sm:flex-1 py-3 px-4 border border-outline-variant rounded-lg text-label-md font-semibold text-on-surface hover:bg-surface-container transition-colors cursor-pointer"
             >
               Save as Draft
             </button>
             <button
               type="submit"
-              className="flex-1 py-3 px-4 bg-primary-container text-on-primary-container text-label-md font-semibold rounded-lg shadow-subtle hover:shadow-hover hover:bg-primary hover:text-on-primary transition-all duration-200"
+              className="w-full sm:flex-1 py-3 px-4 bg-primary-container text-on-primary-container text-label-md font-semibold rounded-lg shadow-subtle hover:shadow-hover hover:bg-primary hover:text-on-primary transition-all duration-200 cursor-pointer"
             >
               Submit Report
             </button>

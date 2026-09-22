@@ -140,10 +140,10 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
       />
 
       {/* Profile Card Modal */}
-      <div className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-stone-200 overflow-hidden z-10 animate-in fade-in zoom-in-95 duration-200">
+      <div className="relative w-full max-w-lg max-h-[90dvh] flex flex-col bg-white rounded-3xl shadow-2xl border border-stone-200 overflow-hidden z-10 animate-in fade-in zoom-in-95 duration-200">
 
         {/* Banner Header with Gradient */}
-        <div className="relative h-28 sm:h-32 bg-gradient-to-r from-amber-500 via-amber-600 to-orange-600 p-4 sm:p-5 flex items-start justify-between">
+        <div className="relative h-28 sm:h-32 shrink-0 bg-gradient-to-r from-amber-500 via-amber-600 to-orange-600 p-4 sm:p-5 flex items-start justify-between">
           <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-black/20 backdrop-blur-md text-white text-xs font-bold border border-white/20">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span>Active Citizen · District 9</span>
@@ -151,7 +151,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
 
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-black/25 hover:bg-black/40 text-white flex items-center justify-center transition-colors focus:outline-none"
+            className="w-8 h-8 rounded-full bg-black/25 hover:bg-black/40 text-white flex items-center justify-center transition-colors focus:outline-none cursor-pointer"
             aria-label="Close profile"
           >
             <span className="material-symbols-outlined text-[20px]">close</span>
@@ -159,7 +159,7 @@ export default function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
         </div>
 
         {/* Profile Content Body */}
-        <div className="px-5 sm:px-6 pb-6 pt-0 relative">
+        <div className="px-4 sm:px-6 pb-6 pt-0 relative overflow-y-auto flex-1">
 
           {/* Avatar Section & Action Button */}
           <div className="flex items-end justify-between -mt-12 sm:-mt-14 mb-4">

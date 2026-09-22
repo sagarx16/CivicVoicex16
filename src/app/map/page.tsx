@@ -370,7 +370,7 @@ export default function MapPage() {
           {/* Map area */}
           <div className="flex-1">
             {/* Map Canvas */}
-            <div className="relative rounded-3xl overflow-hidden shadow-xl border border-gray-200" style={{ height: 520 }}>
+            <div className="relative rounded-3xl overflow-hidden shadow-xl border border-gray-200 h-[380px] sm:h-[460px] md:h-[520px]">
               <div ref={mapRef} className="w-full h-full bg-stone-100 z-0" />
 
               {/* Map controls */}
@@ -399,13 +399,13 @@ export default function MapPage() {
               </div>
 
               {/* Report button */}
-              <div className="absolute bottom-5 left-1/2 -translate-x-1/2 z-[400]">
+              <div className="absolute bottom-4 sm:bottom-5 left-1/2 -translate-x-1/2 z-[400] max-w-[90%] w-max">
                 <a
                   href="/report"
-                  className="flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white text-sm shadow-2xl hover:-translate-y-1 hover:shadow-amber-500/40 transition-all duration-300"
+                  className="flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-bold text-white text-xs sm:text-sm shadow-2xl hover:-translate-y-1 hover:shadow-amber-500/40 transition-all duration-300 whitespace-nowrap"
                   style={{ background: "linear-gradient(135deg, #f59e0b, #d97706)" }}
                 >
-                  <span className="material-symbols-outlined icon-filled text-[18px]">add_circle</span>
+                  <span className="material-symbols-outlined icon-filled text-[16px] sm:text-[18px]">add_circle</span>
                   Report Issue Here
                 </a>
               </div>

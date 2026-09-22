@@ -208,27 +208,27 @@ export default async function HomePage() {
                 <Image src="/community_meeting.jpg" alt="Community meeting" fill sizes="(max-width: 1024px) 100vw, 50vw" loading="lazy" className="object-cover" />
               </div>
               {/* Floating stat card */}
-              <div className="absolute -bottom-4 -right-4 sm:-bottom-6 sm:-right-6 bg-white rounded-2xl shadow-xl p-3.5 sm:p-5 border border-gray-100">
-                <div className="flex items-center gap-2.5 sm:gap-3">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
-                    <span className="material-symbols-outlined icon-filled text-amber-600 text-[20px] sm:text-[24px]">trending_up</span>
+              <div className="absolute -bottom-3 right-2 sm:-bottom-6 sm:-right-6 bg-white rounded-2xl shadow-xl p-3 sm:p-5 border border-gray-100">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl bg-amber-100 flex items-center justify-center shrink-0">
+                    <span className="material-symbols-outlined icon-filled text-amber-600 text-[18px] sm:text-[24px]">trending_up</span>
                   </div>
                   <div>
-                    <p className="text-lg sm:text-2xl font-extrabold text-gray-900 leading-tight">+340%</p>
-                    <p className="text-xs sm:text-sm text-gray-500">Civic participation</p>
+                    <p className="text-base sm:text-2xl font-extrabold text-gray-900 leading-tight">+340%</p>
+                    <p className="text-[11px] sm:text-sm text-gray-500">Civic participation</p>
                   </div>
                 </div>
               </div>
               {/* Floating avatar stack */}
-              <div className="absolute -top-3 -left-3 sm:-top-4 sm:-left-4 bg-white rounded-2xl shadow-lg p-2.5 sm:p-3 border border-gray-100">
+              <div className="absolute top-2 left-2 sm:-top-4 sm:-left-4 bg-white rounded-2xl shadow-lg p-2 sm:p-3 border border-gray-100">
                 <div className="flex -space-x-2">
                   {["#f59e0b","#3b82f6","#22c55e","#a855f7"].map((c, i) => (
-                    <div key={i} className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border-2 border-white flex items-center justify-center text-[10px] sm:text-xs font-bold text-white" style={{ background: c }}>
+                    <div key={i} className="w-6 h-6 sm:w-8 sm:h-8 rounded-full border-2 border-white flex items-center justify-center text-[9px] sm:text-xs font-bold text-white" style={{ background: c }}>
                       {["KJ","SM","PK","MT"][i]}
                     </div>
                   ))}
                 </div>
-                <p className="text-[10px] sm:text-xs text-gray-500 mt-1 sm:mt-1.5 font-medium">+12k joined</p>
+                <p className="text-[9px] sm:text-xs text-gray-500 mt-1 sm:mt-1.5 font-medium">+12k joined</p>
               </div>
             </ScrollReveal>
 

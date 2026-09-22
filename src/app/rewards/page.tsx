@@ -75,21 +75,21 @@ export default function RewardsPage() {
             sizes="(max-width: 1040px) 100vw, 1040px"
           />
           <div className="absolute inset-0" style={{ background: "linear-gradient(135deg, rgba(133,83,0,0.85) 0%, rgba(180,83,9,0.75) 100%)" }} />
-          <div className="relative z-10 p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="relative z-10 p-5 sm:p-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-5 sm:gap-6">
             <div>
-              <p className="text-white/70 text-sm font-medium uppercase tracking-wider mb-1">Total Civic Points</p>
-              <p className="text-6xl font-extrabold text-white leading-none">1,250</p>
-              <p className="text-white/80 mt-2">Ranked <strong>#42</strong> in District 9</p>
+              <p className="text-white/70 text-xs sm:text-sm font-medium uppercase tracking-wider mb-1">Total Civic Points</p>
+              <p className="text-4xl sm:text-6xl font-extrabold text-white leading-none">1,250</p>
+              <p className="text-white/80 mt-2 text-xs sm:text-sm">Ranked <strong>#42</strong> in District 9</p>
             </div>
-            <div className="flex gap-8">
+            <div className="flex justify-between w-full md:w-auto gap-4 sm:gap-8 pt-3 md:pt-0 border-t border-white/15 md:border-t-0">
               {[
                 { value: earned.length, label: "Badges" },
                 { value: "4", label: "Reports" },
                 { value: "12", label: "Polls" },
               ].map((s) => (
-                <div key={s.label} className="text-center">
-                  <p className="text-3xl font-extrabold text-white">{s.value}</p>
-                  <p className="text-white/60 text-sm">{s.label}</p>
+                <div key={s.label} className="text-center flex-1 md:flex-initial">
+                  <p className="text-2xl sm:text-3xl font-extrabold text-white">{s.value}</p>
+                  <p className="text-white/70 text-xs sm:text-sm">{s.label}</p>
                 </div>
               ))}
             </div>

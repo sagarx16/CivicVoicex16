@@ -43,7 +43,7 @@ export default function DashboardPage() {
       <div className="max-w-[1200px] mx-auto animate-fade-in" style={{ paddingBottom: "40px" }}>
         
         <div
-          className="relative overflow-hidden rounded-3xl p-8 mb-8 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6"
+          className="relative overflow-hidden rounded-3xl p-5 sm:p-8 mb-6 sm:mb-8 shadow-md flex flex-col md:flex-row md:items-center justify-between gap-5 sm:gap-6"
         >
           {/* Unsplash Background Image */}
           <Image
@@ -69,10 +69,10 @@ export default function DashboardPage() {
             </p>
           </div>
 
-          <div className="relative z-10 flex gap-3 shrink-0">
+          <div className="relative z-10 flex flex-col sm:flex-row gap-2.5 sm:gap-3 shrink-0 w-full sm:w-auto">
             <Link
               href="/report"
-              className="flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-amber-900 bg-white hover:bg-amber-50 hover:scale-105 transition-all duration-300"
+              className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-amber-900 bg-white hover:bg-amber-50 hover:scale-[1.02] sm:hover:scale-105 transition-all duration-300 w-full sm:w-auto shadow-sm"
               style={{ boxShadow: "0 4px 14px rgba(0,0,0,0.15)" }}
             >
               <span className="material-symbols-outlined icon-filled" style={{ fontSize: 18 }}>add_circle</span>
@@ -80,7 +80,7 @@ export default function DashboardPage() {
             </Link>
             <Link
               href="/forum"
-              className="flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-white border border-white/30 bg-white/10 hover:bg-white/20 transition-all duration-300"
+              className="flex items-center justify-center gap-2 px-5 py-3 rounded-xl text-sm font-bold text-white border border-white/30 bg-white/10 hover:bg-white/20 transition-all duration-300 w-full sm:w-auto"
             >
               <span className="material-symbols-outlined" style={{ fontSize: 18 }}>forum</span>
               Community Forum
@@ -162,10 +162,10 @@ export default function DashboardPage() {
                 <h3 className="text-lg font-bold text-gray-900">Active Civic Passes</h3>
                 <span className="text-xs text-amber-600 font-bold hover:underline cursor-pointer">Manage Passes</span>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
                 {/* Civic Member Pass Card */}
                 <div 
-                  className="rounded-3xl p-6 text-white relative overflow-hidden flex flex-col justify-between"
+                  className="rounded-3xl p-5 sm:p-6 text-white relative overflow-hidden flex flex-col justify-between"
                   style={{ 
                     height: 200, 
                     background: "linear-gradient(135deg, #b45309 0%, #d97706 50%, #f59e0b 100%)",
@@ -181,12 +181,12 @@ export default function DashboardPage() {
                   </div>
                   <div className="z-10 mt-6">
                     <p className="text-xs text-orange-200/75 tracking-widest">MEMBER ID</p>
-                    <p className="text-lg font-bold tracking-widest mt-1">CV-902-882-KJ</p>
+                    <p className="text-base sm:text-lg font-bold tracking-widest mt-1">CV-902-882-KJ</p>
                   </div>
                   <div className="flex justify-between items-end z-10">
                     <div>
                       <p className="text-[9px] text-orange-200/60">HOLDER</p>
-                      <p className="text-xs font-bold">{profileName.toUpperCase()}</p>
+                      <p className="text-xs font-bold truncate max-w-[200px]">{profileName.toUpperCase()}</p>
                     </div>
                   </div>
                   {/* Subtle Background Pattern */}
@@ -194,7 +194,7 @@ export default function DashboardPage() {
                 </div>
 
                 {/* Subpass or secondary information card */}
-                <div className="bg-amber-50/60 rounded-3xl border border-amber-100 shadow-sm p-6 flex flex-col justify-between">
+                <div className="bg-amber-50/60 rounded-3xl border border-amber-100 shadow-sm p-5 sm:p-6 flex flex-col justify-between">
                   <div className="flex justify-between items-start">
                     <div>
                       <span className="text-[10px] text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full font-bold uppercase">
@@ -218,7 +218,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Card 3: Savings Tracker (Civic Project Progress Bars) */}
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 sm:p-6">
               <div className="flex justify-between items-center mb-5">
                 <h3 className="text-lg font-bold text-gray-900">Neighborhood Projects Status</h3>
                 <Link href="/map" className="text-xs text-amber-600 font-bold hover:underline">View Map Projects</Link>
@@ -255,9 +255,9 @@ export default function DashboardPage() {
           </div>
 
           {/* ── RIGHT COLUMN (Fintech Sidebar widgets) ── */}
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-6 sm:gap-8">
             {/* Widget 1: Instant P2P Transfer (Fintech Form adapted to Civic Issue Support) */}
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 sm:p-6">
               <h3 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
                 <span className="material-symbols-outlined text-amber-600 text-[22px]">bolt</span>
                 Quick Issue Support
@@ -293,7 +293,7 @@ export default function DashboardPage() {
 
                 <button
                   type="submit"
-                  className="w-full py-3.5 px-4 rounded-xl font-bold text-white text-sm transition-all shadow-md flex items-center justify-center gap-2"
+                  className="w-full py-3.5 px-4 rounded-xl font-bold text-white text-sm transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer"
                   style={{
                     background: "linear-gradient(135deg, #F59E0B 0%, #EA580C 100%)",
                     boxShadow: "0 3px 10px rgba(217,119,6,0.25)"
@@ -309,7 +309,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Widget 2: Active Chores & Tasks (Fintech list adapted to Community Tasks) */}
-            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-6">
+            <div className="bg-white rounded-3xl border border-gray-100 shadow-sm p-5 sm:p-6">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="text-lg font-bold text-gray-900">Active Tasks & Missions</h3>
                 <Link href="/rewards" className="text-xs text-amber-600 font-bold hover:underline">View All</Link>
