@@ -292,8 +292,32 @@ export default function MapPage() {
               )}
             </form>
 
-            {/* Category filters */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+            {/* Mobile Category pills (touch-friendly horizontal scroll) */}
+            <div className="lg:hidden flex gap-2 overflow-x-auto pb-1 scrollbar-none touch-pan-x w-full">
+              {categories.map((cat) => {
+                const isActive = activeCategory === cat.id;
+                return (
+                  <button
+                    key={cat.id}
+                    onClick={() => setActiveCategory(cat.id)}
+                    className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all shrink-0 cursor-pointer ${
+                      isActive ? `${cat.activeBg} text-white shadow-xs font-bold` : "bg-white text-gray-700 border border-gray-200"
+                    }`}
+                  >
+                    <span className={`material-symbols-outlined text-[16px] ${isActive ? "text-white" : cat.color}`}>
+                      {cat.icon}
+                    </span>
+                    <span>{cat.label}</span>
+                    <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${isActive ? "bg-white/25 text-white" : "bg-gray-100 text-gray-500"}`}>
+                      {cat.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Desktop Category filters */}
+            <div className="hidden lg:block bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
               <p className="font-bold text-gray-900 mb-3 text-sm">Filter by Category</p>
               <div className="flex flex-col gap-1">
                 {categories.map((cat) => {
@@ -327,8 +351,8 @@ export default function MapPage() {
               </div>
             </div>
 
-            {/* Legend */}
-            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+            {/* Desktop Legend */}
+            <div className="hidden lg:block bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
               <p className="font-bold text-gray-900 mb-3 text-sm">Status Legend</p>
               {[
                 { label: "Reported", color: "bg-gray-400" },

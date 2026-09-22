@@ -70,12 +70,12 @@ export default function NotificationsPage() {
   return (
     <AppLayout>
       <div className="max-w-[720px] mx-auto animate-fade-in">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-headline-lg-mobile md:text-headline-md font-bold text-on-surface">
+            <h1 className="text-xl sm:text-headline-md font-bold text-on-surface">
               Notifications
             </h1>
-            <p className="text-body-md text-on-surface-variant mt-1">
+            <p className="text-xs sm:text-body-md text-on-surface-variant mt-1">
               {unreadCount > 0 ? (
                 <span className="text-primary font-medium">{unreadCount} unread</span>
               ) : (
@@ -86,7 +86,7 @@ export default function NotificationsPage() {
           {unreadCount > 0 && (
             <button
               onClick={markAllRead}
-              className="text-label-md text-primary hover:underline flex items-center gap-1"
+              className="text-xs sm:text-label-md text-primary hover:underline flex items-center gap-1 self-start sm:self-auto cursor-pointer"
             >
               <span className="material-symbols-outlined text-[16px]">done_all</span>
               Mark all read
@@ -95,7 +95,7 @@ export default function NotificationsPage() {
         </div>
 
         {/* Filter tabs */}
-        <div className="flex gap-2 overflow-x-auto pb-2 mb-6">
+        <div className="flex gap-2 overflow-x-auto pb-2 mb-6 scrollbar-none touch-pan-x w-full">
           {filters.map((f) => (
             <button
               key={f}

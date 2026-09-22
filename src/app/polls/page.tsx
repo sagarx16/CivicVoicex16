@@ -94,26 +94,26 @@ export default function PollsPage() {
   return (
     <AppLayout>
       <div className="max-w-[800px] mx-auto animate-fade-in">
-        <div className="flex items-center justify-between mb-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-headline-lg-mobile md:text-headline-md font-bold text-on-surface flex items-center gap-2.5">
-              <span className="material-symbols-outlined text-primary text-[32px] md:text-[36px] icon-filled">
+            <h1 className="text-xl sm:text-headline-md font-bold text-on-surface flex items-center gap-2 sm:gap-2.5">
+              <span className="material-symbols-outlined text-primary text-[28px] sm:text-[36px] icon-filled shrink-0">
                 ballot
               </span>
               Polls & Surveys
             </h1>
-            <p className="text-body-md text-on-surface-variant mt-2">
+            <p className="text-xs sm:text-body-md text-on-surface-variant mt-1 sm:mt-2">
               Make your voice heard on community decisions
             </p>
           </div>
-          <div className="flex bg-surface-container rounded-lg p-1 gap-1">
+          <div className="flex bg-surface-container rounded-xl p-1 gap-1 w-full sm:w-auto">
             {["Active", "Closed", "My Votes"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setFilter(tab)}
-                className={`px-3 py-1.5 rounded-md text-label-md transition-colors ${
+                className={`flex-1 sm:flex-none px-3 py-1.5 rounded-lg text-xs sm:text-label-md font-medium transition-colors text-center cursor-pointer ${
                   filter === tab
-                    ? "bg-surface-container-lowest text-on-surface shadow-subtle"
+                    ? "bg-surface-container-lowest text-on-surface shadow-subtle font-bold"
                     : "text-on-surface-variant hover:text-on-surface"
                 }`}
               >

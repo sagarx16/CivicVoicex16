@@ -119,14 +119,14 @@ export default function ForumPage() {
         </div>
 
         {/* Category tabs */}
-        <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-none">
+        <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-none touch-pan-x w-full">
           {categories.map((cat) => (
             <button
               key={cat}
               onClick={() => setActiveCategory(cat)}
-              className={`px-4 py-2 rounded-full text-label-md whitespace-nowrap transition-colors ${
+              className={`px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-label-md whitespace-nowrap transition-colors cursor-pointer shrink-0 ${
                 activeCategory === cat
-                  ? "bg-primary-container text-on-primary-container shadow-subtle"
+                  ? "bg-primary-container text-on-primary-container shadow-subtle font-bold"
                   : "bg-surface-container text-on-surface-variant hover:bg-surface-container-high"
               }`}
             >

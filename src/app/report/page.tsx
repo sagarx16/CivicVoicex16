@@ -159,15 +159,15 @@ function ReportForm() {
               {/* Priority */}
               <div>
                 <label className="block text-label-md text-on-surface mb-2">Priority</label>
-                <div className="flex gap-3">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
                   {priorities.map((p) => (
                     <button
                       key={p.value}
                       type="button"
                       onClick={() => setSelectedPriority(p.value)}
-                      className={`flex-1 py-2 px-3 rounded-lg border-2 text-label-md transition-all ${
+                      className={`py-2 px-1.5 sm:px-3 rounded-lg border-2 text-xs sm:text-label-md transition-all text-center truncate cursor-pointer ${
                         selectedPriority === p.value
-                          ? `${p.bg} ${p.color} border-current`
+                          ? `${p.bg} ${p.color} border-current font-bold`
                           : "border-outline-variant/40 text-on-surface-variant hover:bg-surface-container"
                       }`}
                     >
