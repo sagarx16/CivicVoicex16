@@ -60,7 +60,6 @@ export function ScrollReveal({
         delay,
         ease: "easeOut",
       }}
-      style={{ willChange: "opacity, transform" }}
     >
       {children}
     </motion.div>
@@ -142,7 +141,6 @@ export function StaggerItem({
     <motion.div
       className={className}
       variants={itemVariants}
-      style={{ willChange: "opacity, transform" }}
     >
       {children}
     </motion.div>

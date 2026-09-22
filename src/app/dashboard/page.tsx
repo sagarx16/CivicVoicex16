@@ -93,7 +93,7 @@ export default function DashboardPage() {
             fill
             className="object-cover"
             priority
-            unoptimized
+            sizes="(max-width: 1200px) 100vw, 1200px"
           />
           {/* Dark Overlay for text legibility */}
           <div className="absolute inset-0 bg-gradient-to-r from-stone-900/85 via-stone-900/50 to-transparent" />

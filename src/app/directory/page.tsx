@@ -33,28 +33,28 @@ export default function DirectoryPage() {
 
   return (
     <AppLayout>
-      <div className="max-w-[960px] mx-auto animate-fade-in">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+      <div className="max-w-[960px] mx-auto animate-fade-in w-full">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-headline-lg-mobile md:text-headline-md font-bold text-on-surface flex items-center gap-2.5">
-              <span className="material-symbols-outlined text-primary text-[32px] md:text-[36px] icon-filled">
+            <h1 className="text-xl sm:text-headline-md font-bold text-on-surface flex items-center gap-2 sm:gap-2.5">
+              <span className="material-symbols-outlined text-primary text-[28px] sm:text-[36px] icon-filled shrink-0">
                 contact_page
               </span>
               City Directory
             </h1>
-            <p className="text-body-md text-on-surface-variant mt-2">
+            <p className="text-xs sm:text-body-md text-on-surface-variant mt-1 sm:mt-2">
               Connect with city officials and community representatives
             </p>
           </div>
         </div>
 
         {/* Search Bar */}
-        <div className="relative flex-1 mb-6">
-          <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/70 text-[22px]">
+        <div className="relative flex-1 mb-5 sm:mb-6">
+          <span className="material-symbols-outlined absolute left-3.5 sm:left-4 top-1/2 -translate-y-1/2 text-on-surface-variant/70 text-[20px] sm:text-[22px]">
             search
           </span>
           <input
-            className="block w-full pl-12 pr-4 py-3.5 border border-outline-variant/30 rounded-2xl bg-surface-container-lowest text-body-md text-on-surface placeholder:text-on-surface-variant/40 shadow-subtle focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
+            className="block w-full pl-11 sm:pl-12 pr-4 py-3 sm:py-3.5 border border-outline-variant/30 rounded-2xl bg-surface-container-lowest text-xs sm:text-body-md text-on-surface placeholder:text-on-surface-variant/40 shadow-subtle focus:border-primary focus:ring-1 focus:ring-primary transition-all duration-200"
             placeholder="Search by name, role, or department..."
             type="text"
             value={search}
@@ -62,13 +62,13 @@ export default function DirectoryPage() {
           />
         </div>
 
-        {/* Department Filters Pills */}
-        <div className="flex gap-2 overflow-x-auto pb-4 mb-6 -mx-4 px-4 md:mx-0 md:px-0 scrollbar-none">
+        {/* Department Filters Pills (Smooth horizontal scroll without page overflow) */}
+        <div className="flex gap-2 overflow-x-auto pb-2 mb-6 scrollbar-none touch-pan-x w-full">
           {departments.map((d) => (
             <button
               key={d}
               onClick={() => setDept(d)}
-              className={`px-4 py-2 rounded-full text-label-md transition-all whitespace-nowrap border shrink-0 cursor-pointer ${
+              className={`px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full text-xs sm:text-label-md transition-all whitespace-nowrap border shrink-0 cursor-pointer ${
                 dept === d
                   ? "bg-primary text-on-primary border-primary shadow-subtle font-bold"
                   : "bg-surface-container-lowest text-on-surface-variant border-outline-variant/30 hover:border-outline-variant hover:text-on-surface"
@@ -79,40 +79,40 @@ export default function DirectoryPage() {
           ))}
         </div>
 
-        <p className="text-label-sm text-on-surface-variant mb-4 font-semibold">
+        <p className="text-xs sm:text-label-sm text-on-surface-variant mb-4 font-semibold">
           {filtered.length} contact{filtered.length !== 1 ? "s" : ""} found
         </p>
 
         {/* Grid */}
-        <div className="grid md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
           {filtered.map((official) => (
             <div 
               key={official.name} 
-              className="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 p-5 flex flex-col justify-between hover:shadow-hover hover:-translate-y-1 transition-all duration-300 group"
+              className="bg-surface-container-lowest rounded-2xl border border-outline-variant/20 p-4 sm:p-5 flex flex-col justify-between hover:shadow-hover hover:-translate-y-1 transition-all duration-300 group"
             >
-              <div className="flex items-start gap-4">
+              <div className="flex items-start gap-3.5 sm:gap-4">
                 {/* Avatar with border */}
-                <div className="relative w-16 h-16 rounded-2xl overflow-hidden shrink-0 border-2 border-primary-fixed-dim/40 shadow-sm transition-transform duration-300 group-hover:scale-105">
+                <div className="relative w-14 h-14 sm:w-16 sm:h-16 rounded-2xl overflow-hidden shrink-0 border-2 border-primary-fixed-dim/40 shadow-sm transition-transform duration-300 group-hover:scale-105">
                   <Image
                     src={official.avatar}
                     alt={official.name}
                     fill
                     className="object-cover"
                     loading="lazy"
-                    unoptimized
+                    sizes="(max-width: 640px) 56px, 64px"
                   />
                 </div>
                 
                 {/* Details */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between gap-2">
-                    <div>
-                      <h3 className="text-body-lg font-bold text-on-surface leading-tight truncate group-hover:text-primary transition-colors">
+                    <div className="min-w-0 flex-1">
+                      <h3 className="text-sm sm:text-body-lg font-bold text-on-surface leading-tight truncate group-hover:text-primary transition-colors">
                         {official.name}
                       </h3>
-                      <p className="text-label-md text-primary font-medium mt-0.5">{official.role}</p>
+                      <p className="text-xs sm:text-label-md text-primary font-medium mt-0.5 truncate">{official.role}</p>
                     </div>
-                    <span className={`text-[11px] font-bold tracking-wider uppercase px-2.5 py-0.5 rounded-md ${
+                    <span className={`text-[10px] sm:text-[11px] font-bold tracking-wider uppercase px-2 py-0.5 sm:px-2.5 rounded-md ${
                       official.tag === "Elected"
                         ? "bg-amber-100/70 text-amber-700 dark:bg-amber-950/30 dark:text-amber-300"
                         : "bg-surface-container text-on-surface-variant"
@@ -121,28 +121,30 @@ export default function DirectoryPage() {
                     </span>
                   </div>
                   
-                  <div className="flex items-center gap-1.5 text-body-sm text-on-surface-variant mt-2.5 font-medium">
-                    <span className="material-symbols-outlined text-[16px] text-on-surface-variant/70">business</span>
+                  <div className="flex items-center gap-1.5 text-xs sm:text-body-sm text-on-surface-variant mt-2 sm:mt-2.5 font-medium min-w-0">
+                    <span className="material-symbols-outlined text-[15px] sm:text-[16px] text-on-surface-variant/70 shrink-0">business</span>
                     <span className="truncate">{official.dept}</span>
                   </div>
                 </div>
               </div>
               
               {/* Quick actions row */}
-              <div className="grid grid-cols-2 gap-2 mt-5 pt-4 border-t border-outline-variant/10">
+              <div className="grid grid-cols-2 gap-2 mt-4 pt-3.5 sm:mt-5 sm:pt-4 border-t border-outline-variant/10">
                 <a
                   href={`mailto:${official.email}`}
-                  className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-label-sm font-semibold text-primary bg-primary-fixed/20 hover:bg-primary hover:text-on-primary transition-all duration-200"
+                  className="flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-2 rounded-xl text-xs sm:text-label-sm font-semibold text-primary bg-primary-fixed/20 hover:bg-primary hover:text-on-primary transition-all duration-200 min-w-0"
                 >
-                  <span className="material-symbols-outlined text-[16px] icon-filled">mail</span>
-                  Email
+                  <span className="material-symbols-outlined text-[16px] icon-filled shrink-0">mail</span>
+                  <span className="truncate">Email</span>
                 </a>
                 <a
                   href={`tel:${official.phone}`}
-                  className="flex items-center justify-center gap-2 px-3 py-2 rounded-xl text-label-sm font-semibold text-on-secondary-container bg-secondary-container/40 hover:bg-secondary-container hover:text-on-secondary-container transition-all duration-200"
+                  className="flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-2 rounded-xl text-xs sm:text-label-sm font-semibold text-on-secondary-container bg-secondary-container/40 hover:bg-secondary-container hover:text-on-secondary-container transition-all duration-200 min-w-0"
+                  title={official.phone}
                 >
-                  <span className="material-symbols-outlined text-[16px] icon-filled">call</span>
-                  {official.phone}
+                  <span className="material-symbols-outlined text-[16px] icon-filled shrink-0">call</span>
+                  <span className="truncate sm:hidden">Call</span>
+                  <span className="truncate hidden sm:inline">{official.phone}</span>
                 </a>
               </div>
             </div>

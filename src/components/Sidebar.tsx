@@ -77,39 +77,44 @@ export default function Sidebar({ onClose, onOpenProfile }: SidebarProps) {
       }}
     >
       {/* ── TOP SECTION: Navigation Links ── */}
-      <div className="flex flex-col gap-1 flex-grow relative">
-        {onClose && (
-          <button
+      <div className="flex flex-col gap-1 flex-grow">
+        <div className="flex items-center justify-between px-2 pb-4 mb-3 border-b border-amber-100">
+          <Link
+            href="/"
             onClick={onClose}
-            className="md:hidden absolute -top-2 -right-2 w-8 h-8 rounded-full flex items-center justify-center hover:bg-stone-200 text-stone-500 focus:outline-none"
+            className="flex items-center gap-2.5 group"
+            style={{ textDecoration: "none" }}
           >
-            <span className="material-symbols-outlined text-[20px]">close</span>
-          </button>
-        )}
-        <Link
-          href="/"
-          onClick={onClose}
-          className="flex items-center gap-3 px-3 pb-5 mb-4 border-b border-amber-100 group"
-          style={{ textDecoration: "none" }}
-        >
-          <div
-            className="rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-105"
-            style={{
-              width: 48,
-              height: 48,
-              background: "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)",
-              boxShadow: "0 3px 12px rgba(217,119,6,0.28)",
-            }}
-          >
-            <span className="material-symbols-outlined icon-filled text-white" style={{ fontSize: 26 }}>
-              how_to_vote
+            <div
+              className="rounded-xl flex items-center justify-center transition-all duration-200 group-hover:scale-105"
+              style={{
+                width: 40,
+                height: 40,
+                background: "linear-gradient(135deg, #F59E0B 0%, #D97706 100%)",
+                boxShadow: "0 3px 12px rgba(217,119,6,0.28)",
+              }}
+            >
+              <span className="material-symbols-outlined icon-filled text-white" style={{ fontSize: 22 }}>
+                how_to_vote
+              </span>
+            </div>
+            <span className="font-black tracking-tight text-[22px]">
+              <span className="text-stone-900">Civic</span>
+              <span className="text-amber-600">Voice</span>
             </span>
-          </div>
-          <span className="font-black tracking-tight text-[26px]">
-            <span className="text-stone-900">Civic</span>
-            <span className="text-amber-600">Voice</span>
-          </span>
-        </Link>
+          </Link>
+
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="md:hidden w-8 h-8 rounded-full flex items-center justify-center hover:bg-stone-200 text-stone-600 transition-colors focus:outline-none cursor-pointer"
+              aria-label="Close menu"
+            >
+              <span className="material-symbols-outlined text-[20px]">close</span>
+            </button>
+          )}
+        </div>
         {navItems.map((item) => {
           const isActive = pathname === item.href;
           return (

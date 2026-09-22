@@ -91,9 +91,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#FAF9F7]">
+    <div className="flex flex-col min-h-screen bg-[#FAF9F7] w-full max-w-full overflow-x-hidden">
       {/* ── Mobile Top Bar (Header inside dashboard for mobile screens) ── */}
-      <header className="md:hidden flex justify-between items-center h-16 px-5 bg-white border-b border-[#F0E4D7] sticky top-0 z-40 shadow-xs">
+      <header className="md:hidden flex justify-between items-center h-16 px-4 sm:px-5 bg-white border-b border-[#F0E4D7] sticky top-0 z-40 shadow-xs w-full max-w-full">
         <button 
           onClick={() => setMobileMenuOpen(true)}
           className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-stone-100 text-stone-600 transition-colors cursor-pointer"
@@ -306,7 +306,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           </header>
 
           {/* Main Dashboard Content */}
-          <main className="flex-1 min-w-0 p-6 md:p-8 bg-background">{children}</main>
+          <main className="flex-1 min-w-0 p-4 sm:p-6 md:p-8 bg-background">{children}</main>
         </div>
       </div>
 
